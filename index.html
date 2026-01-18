@@ -702,76 +702,78 @@
     initSig("sigOperator");
 
     // ====== PDF BUILD (clones page, injects signature images, locks fields) ======
-    function buildHtmlForPdf() {
-      const clone = document.documentElement.cloneNode(true);
+   function buildHtmlForPdf() {
+  const clone = document.documentElement.cloneNode(true);
 
-      // Remove scripts
-      clone.querySelectorAll("script").forEach(s => s.remove());
+  // Remove scripts
+  clone.querySelectorAll("script").forEach(s => s.remove());
 
-      // Remove action buttons + file inputs (keep thumbnails)
-      clone.querySelectorAll("button").forEach(b => b.remove());
-      clone.querySelectorAll('input[type="file"]').forEach(f => f.remove());
+  // Remove buttons + file inputs (keep thumbnails)
+  clone.querySelectorAll("button").forEach(b => b.remove());
+  clone.querySelectorAll('input[type="file"]').forEach(f => f.remove());
 
-      // Convert signature canvases to <img>
-      const liveInspector = document.getElementById("sigInspector");
-      const liveOperator  = document.getElementById("sigOperator");
-      const inspData = safeCanvasDataUrl(liveInspector);
-      const operData = safeCanvasDataUrl(liveOperator);
+  // Convert signature canvases to <img>
+  const liveInspector = document.getElementById("sigInspector");
+  const liveOperator  = document.getElementById("sigOperator");
+  const inspData = safeCanvasDataUrl(liveInspector);
+  const operData = safeCanvasDataUrl(liveOperator);
 
-      const clonedInspector = clone.getElementById("sigInspector");
-      const clonedOperator  = clone.getElementById("sigOperator");
+  const clonedInspector = clone.querySelector("#sigInspector");
+  const clonedOperator  = clone.querySelector("#sigOperator");
 
-      if (clonedInspector) {
-        const img = document.createElement("img");
-        img.src = inspData || "";
-        img.alt = "Inspector Signature";
-        img.style.width = "100%";
-        img.style.height = "130px";
-        img.style.border = "1px solid #111";
-        img.style.borderRadius = "6px";
-        clonedInspector.replaceWith(img);
-      }
+  if (clonedInspector) {
+    const img = document.createElement("img");
+    img.src = inspData || "";
+    img.alt = "Inspector Signature";
+    img.style.width = "100%";
+    img.style.height = "130px";
+    img.style.border = "1px solid #111";
+    img.style.borderRadius = "6px";
+    clonedInspector.replaceWith(img);
+  }
 
-      if (clonedOperator) {
-        const img = document.createElement("img");
-        img.src = operData || "";
-        img.alt = "Operator Signature";
-        img.style.width = "100%";
-        img.style.height = "130px";
-        img.style.border = "1px solid #111";
-        img.style.borderRadius = "6px";
-        clonedOperator.replaceWith(img);
-      }
+  if (clonedOperator) {
+    const img = document.createElement("img");
+    img.src = operData || "";
+    img.alt = "Operator Signature";
+    img.style.width = "100%";
+    img.style.height = "130px";
+    img.style.border = "1px solid #111";
+    img.style.borderRadius = "6px";
+    clonedOperator.replaceWith(img);
+  }
 
-      // Copy values from live inputs to cloned inputs
-      const live = document.querySelectorAll("input, textarea, select");
-      const cloned = clone.querySelectorAll("input, textarea, select");
+  // Copy values from live inputs to cloned inputs
+  const live = document.querySelectorAll("input, textarea, select");
+  const cloned = clone.querySelectorAll("input, textarea, select");
 
-      live.forEach((el, i) => {
-        const c = cloned[i];
-        if (!c) return;
+  live.forEach((el, i) => {
+    const c = cloned[i];
+    if (!c) return;
 
-        if (el.type === "radio" || el.type === "checkbox") {
-          c.checked = el.checked;
-          if (el.checked) c.setAttribute("checked", "checked");
-        } else {
-          c.value = el.value;
-          c.setAttribute("value", el.value);
-        }
-        c.setAttribute("disabled", "disabled");
-      });
-
-      // Force selected option visible in cloned selects
-      clone.querySelectorAll("select").forEach(sel => {
-        const val = sel.value;
-        Array.from(sel.options).forEach(o => {
-          if (o.value === val) o.setAttribute("selected", "selected");
-          else o.removeAttribute("selected");
-        });
-      });
-
-      return "<!DOCTYPE html>" + clone.outerHTML;
+    if (el.type === "radio" || el.type === "checkbox") {
+      c.checked = el.checked;
+      if (el.checked) c.setAttribute("checked", "checked");
+    } else if (el.tagName === "TEXTAREA") {
+      c.textContent = el.value;
+    } else {
+      c.value = el.value;
+      c.setAttribute("value", el.value);
     }
+    c.setAttribute("disabled", "disabled");
+  });
+
+  // Fix selected option in cloned selects
+  clone.querySelectorAll("select").forEach(sel => {
+    const val = sel.value;
+    Array.from(sel.options).forEach(o => {
+      if (o.value === val) o.setAttribute("selected", "selected");
+      else o.removeAttribute("selected");
+    });
+  });
+
+  return "<!DOCTYPE html>" + clone.outerHTML;
+}
 
     function safeCanvasDataUrl(canvas){
       try{
