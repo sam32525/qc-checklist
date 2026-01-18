@@ -29,9 +29,10 @@
       border:1px solid var(--line);
       padding:18px;
       position:relative;
-      padding-bottom:170px;
+      padding-bottom:170px; /* reserve for footer */
     }
 
+    /* Header */
     .header-with-logo{
       display:grid;
       grid-template-columns: 1fr auto;
@@ -59,6 +60,7 @@
       justify-self:end;
     }
 
+    /* Meta */
     .meta{
       display:grid;
       grid-template-columns: repeat(4, 1fr);
@@ -81,6 +83,7 @@
     }
     textarea{ resize:vertical; }
 
+    /* Section title */
     .section-title{
       text-align:center;
       font-weight:700;
@@ -91,6 +94,7 @@
       padding:6px 10px;
     }
 
+    /* Tables */
     table{ width:100%; border-collapse:collapse; }
     th, td{
       border:1px solid var(--line);
@@ -106,6 +110,7 @@
 
     .center{ text-align:center; }
     .w-sn{ width:60px; }
+    .w-item{ width:auto; }
     .w-status{ width:170px; }
     .w-remarks{ width:260px; }
     .w-photo{ width:260px; }
@@ -118,6 +123,7 @@
       gap:6px;
     }
 
+    /* Photo cell */
     .photo-cell{
       display:flex;
       flex-direction:column;
@@ -141,6 +147,7 @@
     }
     .thumb img{ width:100%; height:100%; object-fit:contain; }
 
+    /* Textareas */
     .chk-remarks{
       height:70px;
       min-height:70px;
@@ -156,9 +163,11 @@
       box-sizing:border-box;
     }
 
+    /* Highlight Yes/No */
     input[value="No"]:checked{ accent-color:#c0392b; }
     input[value="Yes"]:checked{ accent-color:#1e8e3e; }
 
+    /* Signatures */
     .sign-grid{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -221,6 +230,7 @@
       flex-wrap:wrap;
     }
 
+    /* Footer inside border */
     .footer{
       position:absolute;
       left:18px;
@@ -271,14 +281,20 @@
 
 <body>
   <div class="page">
+    <!-- HEADER -->
     <div class="header-with-logo">
       <div class="header-text">
         <div class="org">CSP Abu Dhabi Terminal Environment, Health and Safety Management</div>
         <div class="title">Quay Crane (QC) Inspection Checklist</div>
       </div>
-      <img class="hdr-logo" src="logo.png" alt="COSCO Logo">
+
+      <!-- IMPORTANT: upload your logo file to GitHub repo root (same folder as index.html)
+           Your file name is: COSCO Logo_H.png
+           Keep EXACT name, and use %20 for space -->
+      <img class="hdr-logo" src="COSCO%20Logo_H.png" alt="COSCO Logo">
     </div>
 
+    <!-- META -->
     <div class="meta">
       <div class="field">
         <label>QC No.</label>
@@ -324,12 +340,13 @@
       </div>
     </div>
 
+    <!-- CHECKLIST -->
     <div class="section-title">A. PRE-OPERATION & SAFETY CONTROLS</div>
-    <table>
+    <table id="checklist">
       <thead>
         <tr>
           <th class="w-sn">S/N</th>
-          <th>Inspection Item</th>
+          <th class="w-item">Inspection Item</th>
           <th class="w-status">Status</th>
           <th class="w-remarks">Remarks</th>
           <th class="w-photo">Photo (Optional)</th>
@@ -338,7 +355,9 @@
       <tbody id="checklistBody"></tbody>
     </table>
 
+    <!-- OBSERVATIONS / RECOMMENDATIONS -->
     <div class="section-title">B. OBSERVATIONS & RECOMMENDATIONS</div>
+
     <table id="obsTable">
       <thead>
         <tr>
@@ -358,6 +377,7 @@
       <button type="button" class="secondary" onclick="removeObsRow()">Remove Last Row</button>
     </div>
 
+    <!-- SIGNATURES -->
     <div class="section-title">C. SIGNATURES</div>
     <div class="sign-grid">
       <div class="sigbox">
@@ -377,11 +397,13 @@
       </div>
     </div>
 
+    <!-- ACTIONS -->
     <div class="actions">
       <button type="button" onclick="sendEmailPdf()">Send Email (PDF)</button>
       <button type="button" class="secondary" onclick="resetForm()">Reset</button>
     </div>
 
+    <!-- FOOTER -->
     <div class="footer">
       <table class="footer-table">
         <tr>
@@ -401,9 +423,17 @@
   </div>
 
   <script>
+    // =========================
+    // 1) GOOGLE APPS SCRIPT URL (YOUR WEB APP URL)
+    // =========================
+    // IMPORTANT:
+    // This must be the Apps Script **Web App** URL (Deploy -> Web app).
+    // If you pasted the correct URL, "Send Email (PDF)" will work.
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxubvRAaQEHWjob_M2EmPEqhKNpmXtSjFfatcIscWHKaWPWj5bmmFwskuLjvfzOX_K9Og/exec";
-    const FIXED_TO_EMAIL = "saleh.shaikh@cspadt.ae";
 
+    // =========================
+    // 2) CHECKLIST ITEMS
+    // =========================
     const items = [
       "QC isolation / lock-out not required (machine in safe state before checks)",
       "Operator fit for duty (no fatigue / impairment)",
@@ -508,35 +538,13 @@
       "All alarms function during movement (as applicable)"
     ];
 
-    function escapeHtml(s){
-      return String(s)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
-    function previewPhoto(event, targetId){
-      const file = event.target.files && event.target.files[0];
-      const box = document.getElementById(targetId);
-      if(!file){ box.textContent = "No image"; return; }
-
-      const img = document.createElement("img");
-      img.alt = "Photo";
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        box.innerHTML = "";
-        img.src = e.target.result;
-        box.appendChild(img);
-      };
-      reader.readAsDataURL(file);
-    }
-
+    // =========================
+    // 3) RENDER CHECKLIST
+    // =========================
     function createChecklistRow(sn, text){
       const idBase = "row" + sn;
       return `
-        <tr>
+        <tr data-row="${sn}">
           <td class="center">${sn}</td>
           <td>${escapeHtml(text)}</td>
           <td class="center">
@@ -544,27 +552,31 @@
             <label class="opt"><input type="radio" name="${idBase}_status" value="No"><span>No</span></label>
             <label class="opt"><input type="radio" name="${idBase}_status" value="N/A"><span>N/A</span></label>
           </td>
-          <td><textarea class="chk-remarks" name="${idBase}_remarks" placeholder="Remarks / defect details..."></textarea></td>
+          <td>
+            <textarea class="chk-remarks" name="${idBase}_remarks" placeholder="Remarks / defect details..."></textarea>
+          </td>
           <td>
             <div class="photo-cell">
               <input type="file" accept="image/*" onchange="previewPhoto(event,'${idBase}_img')">
-              <div class="thumb" id="${idBase}_img">No image</div>
+              <div class="thumb" id="${idBase}_img" data-img="">No image</div>
             </div>
           </td>
         </tr>
       `;
     }
 
-    document.getElementById("checklistBody").innerHTML =
-      items.map((t,i)=>createChecklistRow(i+1,t)).join("");
+    const tbody = document.getElementById("checklistBody");
+    tbody.innerHTML = items.map((t,i)=>createChecklistRow(i+1,t)).join("");
 
-    // Observations dynamic rows
+    // =========================
+    // 4) OBSERVATIONS (ADD/REMOVE) + PHOTO
+    // =========================
     let obsCount = 0;
 
     function createObsRow(sn){
       const idBase = "obs" + sn;
       return `
-        <tr>
+        <tr data-obs="${sn}">
           <td class="center">${sn}</td>
           <td><textarea class="obs-ta" name="${idBase}_obs" placeholder="Describe issue..."></textarea></td>
           <td><textarea class="rec-ta" name="${idBase}_rec" placeholder="Action required..."></textarea></td>
@@ -573,7 +585,7 @@
           <td>
             <div class="photo-cell">
               <input type="file" accept="image/*" onchange="previewPhoto(event,'${idBase}_img')">
-              <div class="thumb" id="${idBase}_img">No image</div>
+              <div class="thumb" id="${idBase}_img" data-img="">No image</div>
             </div>
           </td>
         </tr>
@@ -586,16 +598,46 @@
     }
 
     function removeObsRow(){
+      const obsBody = document.getElementById("obsBody");
       if(obsCount <= 1) return;
-      const body = document.getElementById("obsBody");
-      body.removeChild(body.lastElementChild);
+      obsBody.removeChild(obsBody.lastElementChild);
       obsCount -= 1;
     }
 
-    // init 6 observation rows
-    for(let i=0;i<6;i++) addObsRow();
+    // Start with 6 rows
+    (function initObs(){
+      for(let i=0;i<6;i++) addObsRow();
+    })();
 
-    // signature pads
+    // =========================
+    // 5) PHOTO PREVIEW (SAVES BASE64 INTO data-img)
+    // =========================
+    function previewPhoto(event, targetId){
+      const file = event.target.files && event.target.files[0];
+      const box = document.getElementById(targetId);
+      if(!file){
+        box.textContent = "No image";
+        box.dataset.img = "";
+        return;
+      }
+
+      const img = document.createElement("img");
+      img.alt = "Photo";
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target.result;     // base64
+        box.innerHTML = "";
+        img.src = dataUrl;
+        box.appendChild(img);
+        box.dataset.img = dataUrl;           // keep base64 for PDF/template
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // =========================
+    // 6) SIGNATURE PAD
+    // =========================
     function initSig(canvasId){
       const canvas = document.getElementById(canvasId);
       const ctx = canvas.getContext("2d");
@@ -614,12 +656,14 @@
       window.addEventListener("resize", resize);
 
       let drawing = false;
+
       function pos(e){
         const rect = canvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         return { x: clientX - rect.left, y: clientY - rect.top };
       }
+
       function start(e){
         drawing = true;
         const p = pos(e);
@@ -634,7 +678,10 @@
         ctx.stroke();
         e.preventDefault();
       }
-      function end(e){ drawing = false; e.preventDefault(); }
+      function end(e){
+        drawing = false;
+        e.preventDefault();
+      }
 
       canvas.addEventListener("mousedown", start);
       canvas.addEventListener("mousemove", move);
@@ -654,6 +701,24 @@
     initSig("sigInspector");
     initSig("sigOperator");
 
+    function safeCanvasDataUrl(canvas){
+      try{
+        const ctx = canvas.getContext("2d");
+        const pixels = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+        let hasInk = false;
+        for (let i=3; i<pixels.length; i+=4){
+          if (pixels[i] !== 0){ hasInk = true; break; }
+        }
+        if(!hasInk) return "";
+        return canvas.toDataURL("image/png");
+      }catch(e){
+        return "";
+      }
+    }
+
+    // =========================
+    // 7) RESET
+    // =========================
     function resetForm(){
       if(!confirm("Reset everything?")) return;
 
@@ -662,8 +727,13 @@
       document.querySelectorAll("textarea").forEach(t=>t.value="");
       document.querySelectorAll("input[type='radio']").forEach(r=>r.checked=false);
       document.querySelectorAll("input[type='file']").forEach(f=>f.value="");
-      document.querySelectorAll(".thumb").forEach(t=>t.textContent="No image");
+      document.querySelectorAll(".thumb").forEach(t=>{
+        t.textContent="No image";
+        t.dataset.img="";
+        t.innerHTML="No image";
+      });
 
+      // reset observations back to 6 rows
       const obsBody = document.getElementById("obsBody");
       obsBody.innerHTML = "";
       obsCount = 0;
@@ -673,95 +743,68 @@
       clearSig("sigOperator");
     }
 
-    // ---- PDF builder: NO clone.getElementById ANYWHERE ----
-    function safeCanvasDataUrl(canvas){
-      try{
-        if(!canvas) return "";
-        return canvas.toDataURL("image/png");
-      }catch(e){
-        return "";
-      }
-    }
-
-    function buildHtmlForPdf(){
-      const clone = document.documentElement.cloneNode(true);
-
-      // remove scripts / buttons / file inputs
-      clone.querySelectorAll("script").forEach(s => s.remove());
-      clone.querySelectorAll("button").forEach(b => b.remove());
-      clone.querySelectorAll('input[type="file"]').forEach(f => f.remove());
-
-      // replace canvases with images (signatures)
-      const inspData = safeCanvasDataUrl(document.getElementById("sigInspector"));
-      const operData = safeCanvasDataUrl(document.getElementById("sigOperator"));
-
-      const inspCanvas = clone.querySelector("#sigInspector");
-      if(inspCanvas){
-        const img = document.createElement("img");
-        img.src = inspData;
-        img.style.width = "100%";
-        img.style.height = "130px";
-        img.style.border = "1px solid #111";
-        img.style.borderRadius = "6px";
-        inspCanvas.replaceWith(img);
-      }
-
-      const operCanvas = clone.querySelector("#sigOperator");
-      if(operCanvas){
-        const img = document.createElement("img");
-        img.src = operData;
-        img.style.width = "100%";
-        img.style.height = "130px";
-        img.style.border = "1px solid #111";
-        img.style.borderRadius = "6px";
-        operCanvas.replaceWith(img);
-      }
-
-      // copy values
-      const live = document.querySelectorAll("input, textarea, select");
-      const cloned = clone.querySelectorAll("input, textarea, select");
-
-      live.forEach((el,i)=>{
-        const c = cloned[i];
-        if(!c) return;
-
-        if(el.type === "radio" || el.type === "checkbox"){
-          c.checked = el.checked;
-          if(el.checked) c.setAttribute("checked","checked");
-          else c.removeAttribute("checked");
-        }else if(el.tagName === "TEXTAREA"){
-          c.textContent = el.value;
-        }else{
-          c.value = el.value;
-          c.setAttribute("value", el.value);
-        }
-        c.setAttribute("disabled","disabled");
-      });
-
-      // fix selected option
-      clone.querySelectorAll("select").forEach(sel=>{
-        const val = sel.value;
-        Array.from(sel.options).forEach(o=>{
-          if(o.value === val) o.setAttribute("selected","selected");
-          else o.removeAttribute("selected");
-        });
-      });
-
-      return "<!DOCTYPE html>" + clone.outerHTML;
-    }
-
+    // =========================
+    // 8) SEND EMAIL (TEMPLATE MODE)
+    //    Sends ONLY DATA to Apps Script.
+    //    Apps Script template creates PDF and attaches it.
+    // =========================
     async function sendEmailPdf(){
-      alert("Send started...");
-
       try{
-        const qcNo = document.querySelector('[name="qcNo"]')?.value || "QC";
+        const qcNo = (document.querySelector('[name="qcNo"]')?.value || "QC").trim() || "QC";
         const date = document.querySelector('[name="date"]')?.value || new Date().toISOString().slice(0,10);
 
+        // Collect checklist rows
+        const checklist = [];
+        document.querySelectorAll("#checklistBody tr").forEach((tr, idx) => {
+          const sn = idx + 1;
+          const itemText = tr.children[1]?.innerText || "";
+          const status = tr.querySelector('input[type="radio"]:checked')?.value || "";
+          const remarks = tr.querySelector("textarea")?.value || "";
+          const photoBase64 = tr.querySelector(".thumb")?.dataset?.img || "";
+          checklist.push({ sn, text: itemText, status, remarks, photo: photoBase64 });
+        });
+
+        // Collect observations rows
+        const observations = [];
+        document.querySelectorAll("#obsBody tr").forEach((tr, idx) => {
+          const sn = idx + 1;
+          const obs = tr.querySelector('textarea[name^="obs"]')?.value || tr.children[1]?.querySelector("textarea")?.value || "";
+          const rec = tr.querySelector('textarea[name^="obs"]')?.value || tr.children[2]?.querySelector("textarea")?.value || "";
+          const targetDate = tr.children[3]?.querySelector("input")?.value || "";
+          const responsible = tr.children[4]?.querySelector("input")?.value || "";
+          const photoBase64 = tr.querySelector(".thumb")?.dataset?.img || "";
+          observations.push({ sn, obs, rec, targetDate, responsible, photo: photoBase64 });
+        });
+
         const payload = {
-          to: FIXED_TO_EMAIL,
+          // email/pdf naming
           subject: `QC Inspection Checklist - ${qcNo} - ${date}`,
           filename: `QC_Inspection_${qcNo}_${date}`,
-          html: buildHtmlForPdf()
+
+          // meta fields
+          qcNo: document.querySelector('[name="qcNo"]')?.value || "",
+          date: document.querySelector('[name="date"]')?.value || "",
+          shift: document.querySelector('[name="shift"]')?.value || "",
+          time: document.querySelector('[name="time"]')?.value || "",
+          operator: document.querySelector('[name="operator"]')?.value || "",
+          inspector: document.querySelector('[name="inspector"]')?.value || "",
+          weather: document.querySelector('[name="weather"]')?.value || "",
+          wind: document.querySelector('[name="wind"]')?.value || "",
+          generalComments: document.querySelector('[name="generalComments"]')?.value || "",
+
+          // footer
+          docNo: document.querySelector('[name="docNo"]')?.value || "",
+          revNo: document.querySelector('[name="revNo"]')?.value || "",
+          effDate: document.querySelector('[name="effDate"]')?.value || "",
+          pageNo: document.querySelector('[name="pageNo"]')?.value || "",
+
+          // data tables
+          checklist,
+          observations,
+
+          // signatures
+          sigInspector: safeCanvasDataUrl(document.getElementById("sigInspector")),
+          sigOperator: safeCanvasDataUrl(document.getElementById("sigOperator"))
         };
 
         const res = await fetch(SCRIPT_URL, {
@@ -772,24 +815,27 @@
 
         const text = await res.text();
         let out = {};
-        try{ out = JSON.parse(text); }catch(e){}
+        try{ out = JSON.parse(text); } catch(e){}
 
-        if(out.ok){
-          alert("Email sent successfully to " + FIXED_TO_EMAIL);
-        }else{
-          alert("Send failed: " + (out.error || text));
+        if(out && out.ok){
+          alert("Sent successfully (PDF attachment) to saleh.shaikh@cspadt.ae");
+        } else {
+          alert("Send failed: " + (out.error || text || "Unknown error"));
         }
+
       }catch(err){
         alert("ERROR: " + err.message);
       }
     }
 
-    // expose for inline onclick
-    window.addObsRow = addObsRow;
-    window.removeObsRow = removeObsRow;
-    window.clearSig = clearSig;
-    window.resetForm = resetForm;
-    window.sendEmailPdf = sendEmailPdf;
+    function escapeHtml(s){
+      return String(s)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
   </script>
 </body>
 </html>
