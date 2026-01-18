@@ -789,35 +789,6 @@
       }
     }
 
-    async function sendEmailPdf() {
-      const qcNo = document.querySelector('[name="qcNo"]')?.value?.trim() || "QC";
-      const date = document.querySelector('[name="date"]')?.value || new Date().toISOString().slice(0,10);
-
-      const payload = {
-        to: FIXED_TO_EMAIL,
-        subject: `QC Inspection Checklist - ${qcNo} - ${date}`,
-        filename: `QC_Inspection_${qcNo}_${date}.pdf`,
-        html: buildHtmlForPdf()
-      };
-
-      try{
-        const res = await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
-        });
-
-        const out = await res.json().catch(() => ({}));
-
-        if (out && out.ok) {
-          alert("Email sent successfully to " + FIXED_TO_EMAIL);
-        } else {
-          alert("Failed to send email. Check Apps Script deployment + permissions.");
-        }
-      }catch(err){
-        alert("Failed to send email. Network/API error.");
-      }
-    }
 
     function escapeHtml(s){
       return String(s)
@@ -829,4 +800,39 @@
     }
   </script>
 </body>
+  <script>
+async function sendEmailPdf() {
+  alert("Send started...");
+
+  try {
+    const qcNo = document.querySelector('[name="qcNo"]')?.value || "QC";
+    const date = document.querySelector('[name="date"]')?.value || new Date().toISOString().slice(0,10);
+
+    const payload = {
+      subject: `QC Inspection Checklist - ${qcNo} - ${date}`,
+      filename: `QC_Inspection_${qcNo}_${date}`,
+      html: buildHtmlForPdf()
+    };
+
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    });
+
+    const text = await res.text();
+    let out = {};
+    try { out = JSON.parse(text); } catch(e){}
+
+    if (out.ok) {
+      alert("Email sent successfully to saleh.shaikh@cspadt.ae");
+    } else {
+      alert("Send failed: " + (out.error || text));
+    }
+  } catch (err) {
+    alert("ERROR: " + err.message);
+  }
+}
+</script>
+
 </html>
