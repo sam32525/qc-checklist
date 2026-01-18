@@ -107,6 +107,7 @@
       color:var(--csp-dark);
       text-align:center;
     }
+    td { position:relative; }
 
     .center{ text-align:center; }
     .w-sn{ width:60px; }
@@ -153,12 +154,14 @@
       min-height:70px;
       max-height:180px;
       overflow:auto;
+      box-sizing:border-box;
     }
     .obs-ta, .rec-ta{
       height:110px;
       min-height:110px;
       max-height:240px;
       overflow:auto;
+      box-sizing:border-box;
     }
 
     /* Highlight Yes/No */
@@ -220,6 +223,14 @@
       flex-wrap:wrap;
     }
 
+    .obs-actions{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      margin:8px 0 0;
+      flex-wrap:wrap;
+    }
+
     /* Footer inside border */
     .footer{
       position:absolute;
@@ -260,7 +271,7 @@
 
     @media print{
       body{ background:#fff; padding:0; }
-      .actions, .sig-actions{ display:none !important; }
+      .actions, .sig-actions, .obs-actions{ display:none !important; }
       input, textarea, select{ border:0 !important; }
       .photo-cell input{ display:none !important; }
       .page{ border:none; padding-bottom:0; }
@@ -278,11 +289,8 @@
         <div class="title">Quay Crane (QC) Inspection Checklist</div>
       </div>
 
-      <!-- OPTION A (recommended): put a real file "logo.png" in same repo -->
-      <img class="hdr-logo" src="COSCO%20Logo_H.png" alt="COSCO Logo">
-
-
-      <!-- OPTION B: if you want base64, replace the src above with your base64 string -->
+      <!-- Put logo file in same GitHub repo folder as index.html -->
+      <img class="hdr-logo" src="logo.png" alt="COSCO Logo">
     </div>
 
     <!-- META -->
@@ -348,7 +356,8 @@
 
     <!-- OBSERVATIONS / RECOMMENDATIONS -->
     <div class="section-title">B. OBSERVATIONS & RECOMMENDATIONS</div>
-    <table>
+
+    <table id="obsTable">
       <thead>
         <tr>
           <th class="w-sn">S/N</th>
@@ -356,37 +365,16 @@
           <th>Recommendation / Action Required</th>
           <th style="width:180px;">Target Date</th>
           <th style="width:180px;">Responsible</th>
+          <th class="w-photo">Photo (Optional)</th>
         </tr>
       </thead>
-      <tbody>
-        <tbody>
-  <tr>
-    <td class="center">1</td>
-    <td><textarea class="obs-ta" placeholder="Describe issue..."></textarea></td>
-    <td><textarea class="rec-ta" placeholder="Action required..."></textarea></td>
-    <td><input type="date"></td>
-    <td><input type="text" placeholder="Name/Dept"></td>
-  </tr>
-  <tr>
-    <td class="center">2</td>
-    <td><textarea class="obs-ta" placeholder="Describe issue..."></textarea></td>
-    <td><textarea class="rec-ta" placeholder="Action required..."></textarea></td>
-    <td><input type="date"></td>
-    <td><input type="text" placeholder="Name/Dept"></td>
-  </tr>
-  <tr>
-    <td class="center">3</td>
-    <td><textarea class="obs-ta" placeholder="Describe issue..."></textarea></td>
-    <td><textarea class="rec-ta" placeholder="Action required..."></textarea></td>
-    <td><input type="date"></td>
-    <td><input type="text" placeholder="Name/Dept"></td>
-  </tr>
-  <tr>
-    <td class="center">4</td>
-    <td><textarea class="obs-ta" placeholder="Describe issue..."></textarea></td>
-    <td><textarea class="rec-ta" placeholder="Ac
-      </tbody>
+      <tbody id="obsBody"></tbody>
     </table>
+
+    <div class="obs-actions">
+      <button type="button" class="secondary" onclick="addObsRow()">Add Observation Row</button>
+      <button type="button" class="secondary" onclick="removeObsRow()">Remove Last Row</button>
+    </div>
 
     <!-- SIGNATURES -->
     <div class="section-title">C. SIGNATURES</div>
@@ -424,19 +412,22 @@
           <th>Page</th>
         </tr>
         <tr>
-          <td><input type="text" value="CSPADT-HSE-FM-___" /></td>
-          <td><input type="text" value="00" /></td>
-          <td><input type="text" value="YYYY-MM-DD" /></td>
-          <td><input type="text" value="1 of 1" /></td>
+          <td><input type="text" name="docNo" value="CSPADT-HSE-FM-___" /></td>
+          <td><input type="text" name="revNo" value="00" /></td>
+          <td><input type="text" name="effDate" value="YYYY-MM-DD" /></td>
+          <td><input type="text" name="pageNo" value="1 of 1" /></td>
         </tr>
       </table>
     </div>
   </div>
 
   <script>
-    // ====== COMPLETE CHECKLIST ITEMS (80+ items) ======
+    // ====== YOUR GOOGLE APPS SCRIPT API ======
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxubvRAaQEHWjob_M2EmPEqhKNpmXtSjFfatcIscWHKaWPWj5bmmFwskuLjvfzOX_K9Og/exec";
+    const FIXED_TO_EMAIL = "saleh.shaikh@cspadt.ae"; // required recipient
+
+    // ====== COMPLETE CHECKLIST ITEMS ======
     const items = [
-      // A. PRE-OPERATION & SAFETY CONTROLS
       "QC isolation / lock-out not required (machine in safe state before checks)",
       "Operator fit for duty (no fatigue / impairment)",
       "Work area clear of unauthorized personnel",
@@ -457,8 +448,6 @@
       "First aid kit available (if applicable to QC)",
       "Emergency escape route clear",
       "Safety signage present and readable",
-
-      // B. STRUCTURE / GANTRY / BOOM
       "Boom condition (no visible structural damage / cracks)",
       "Boom pins / latches / locking mechanism OK",
       "Gantry structure (no deformation / missing fasteners)",
@@ -469,8 +458,6 @@
       "Welds visually sound (no obvious cracks)",
       "Access gates / safety chains in place",
       "Fall protection anchor points intact (where provided)",
-
-      // C. WIRE ROPES / SHEAVES / DRUMS
       "Hoist wire ropes condition (no broken wires / kinks / birdcage)",
       "Rope lubrication adequate",
       "Rope reeving correct / no cross-over on drum",
@@ -478,8 +465,6 @@
       "Sheave guards in place",
       "Drum grooves OK / no sharp edges",
       "Rope end connections secure",
-
-      // D. SPREADER / TWISTLOCKS / HEADBLOCK
       "Spreader condition (no damage / deformation)",
       "Twistlocks operate smoothly (lock/unlock)",
       "Twistlock indicators functional (locked/unlocked)",
@@ -490,8 +475,6 @@
       "Spreader hydraulic hoses (no leaks / abrasion)",
       "Hydraulic cylinders (no leaks / damage)",
       "Hydraulic oil level within range (if check point available)",
-
-      // E. BRAKES / MOTORS / GEARBOX
       "Hoist brake performance normal (no abnormal slip / noise)",
       "Trolley brakes OK",
       "Gantry brakes OK",
@@ -500,8 +483,6 @@
       "Gearbox oil levels OK (if sight glass available)",
       "Couplings/guards in place",
       "Abnormal noise during test run (none)",
-
-      // F. TROLLEY / TRAVEL SYSTEM
       "Trolley travel smooth (no jerking / abnormal sound)",
       "Trolley rail condition (no obstruction / damage)",
       "Bumpers / end stops OK",
@@ -509,8 +490,6 @@
       "Festoon rollers OK / no snagging",
       "Trolley wheels condition OK",
       "Trolley alignment normal",
-
-      // G. GANTRY TRAVEL / RAILS
       "Gantry travel smooth (no abnormal noise/vibration)",
       "Rail clamps / storm locks functional",
       "Wheel condition (no flat spots / abnormal wear)",
@@ -518,8 +497,6 @@
       "Gantry end stops / buffers OK",
       "Gantry travel alarms operational",
       "Skew control system OK (if equipped)",
-
-      // H. ELECTRICAL / CONTROL SYSTEM
       "Control panel doors closed/secured",
       "No exposed wires / damaged insulation",
       "Cable routing secured / no hanging cables",
@@ -530,31 +507,23 @@
       "Overload protection system OK (as per procedure)",
       "PLC / fault alarms checked (no critical active faults)",
       "Air-conditioning / ventilation functional",
-
-      // I. CABIN / ERGONOMICS
       "Cabin glass clean / visibility OK",
       "Wipers / washers functional (if applicable)",
       "Seat condition / seatbelt functional",
       "Cabin door locks / emergency exit accessible",
       "Mirror condition OK (if applicable)",
       "Cabin housekeeping OK (no loose items)",
-
-      // J. SAFETY DEVICES / EMERGENCY
       "Emergency ladder / rescue equipment available (if applicable)",
       "Fire detection / alarm system OK (if installed)",
       "Emergency lighting OK (if installed)",
       "Lifebuoy / rescue items present (if applicable at waterside)",
       "Communication with control room tested (if required)",
       "Stop-work / escalation process understood by operator",
-
-      // K. LEAKS / ENVIRONMENT / HOUSEKEEPING
       "No oil leaks on platforms / ground",
       "No hydraulic leaks observed",
       "Drip trays in place (where provided)",
       "Waste bins present / used properly",
       "Spill kit accessible (if designated for QC area)",
-
-      // L. TEST RUN
       "No-load hoist up/down test OK",
       "Trolley full travel test OK",
       "Gantry short travel test OK (if permitted)",
@@ -562,12 +531,12 @@
       "All alarms function during movement (as applicable)"
     ];
 
-    function createRow(sn, text){
+    function createChecklistRow(sn, text){
       const idBase = "row" + sn;
       return `
         <tr>
           <td class="center">${sn}</td>
-          <td>${text}</td>
+          <td>${escapeHtml(text)}</td>
           <td class="center">
             <label class="opt"><input type="radio" name="${idBase}_status" value="Yes"><span>Yes</span></label>
             <label class="opt"><input type="radio" name="${idBase}_status" value="No"><span>No</span></label>
@@ -588,8 +557,49 @@
 
     // Render checklist
     const tbody = document.getElementById("checklistBody");
-    tbody.innerHTML = items.map((t,i)=>createRow(i+1,t)).join("");
+    tbody.innerHTML = items.map((t,i)=>createChecklistRow(i+1,t)).join("");
 
+    // ===== Observations renderer (with photo + add/remove rows) =====
+    let obsCount = 0;
+
+    function createObsRow(sn){
+      const idBase = "obs" + sn;
+      return `
+        <tr>
+          <td class="center">${sn}</td>
+          <td><textarea class="obs-ta" name="${idBase}_obs" placeholder="Describe issue..."></textarea></td>
+          <td><textarea class="rec-ta" name="${idBase}_rec" placeholder="Action required..."></textarea></td>
+          <td><input type="date" name="${idBase}_date"></td>
+          <td><input type="text" name="${idBase}_resp" placeholder="Name/Dept"></td>
+          <td>
+            <div class="photo-cell">
+              <input type="file" accept="image/*" onchange="previewPhoto(event,'${idBase}_img')">
+              <div class="thumb" id="${idBase}_img">No image</div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    function addObsRow(){
+      obsCount += 1;
+      const obsBody = document.getElementById("obsBody");
+      obsBody.insertAdjacentHTML("beforeend", createObsRow(obsCount));
+    }
+
+    function removeObsRow(){
+      if(obsCount <= 1) return;
+      const obsBody = document.getElementById("obsBody");
+      obsBody.removeChild(obsBody.lastElementChild);
+      obsCount -= 1;
+    }
+
+    // start with 6 rows (like your original intention)
+    (function initObs(){
+      for(let i=0;i<6;i++) addObsRow();
+    })();
+
+    // ===== Photo preview (stores base64 in <img>, so PDF can include it) =====
     function previewPhoto(event, targetId){
       const file = event.target.files && event.target.files[0];
       const box = document.getElementById(targetId);
@@ -601,7 +611,7 @@
       const reader = new FileReader();
       reader.onload = (e) => {
         box.innerHTML = "";
-        img.src = e.target.result;
+        img.src = e.target.result;        // IMPORTANT: base64 data URL
         box.appendChild(img);
       };
       reader.readAsDataURL(file);
@@ -612,7 +622,6 @@
       const canvas = document.getElementById(canvasId);
       const ctx = canvas.getContext("2d");
 
-      // Scale for crisp lines
       function resize(){
         const rect = canvas.getBoundingClientRect();
         const ratio = window.devicePixelRatio || 1;
@@ -672,7 +681,6 @@
     function resetForm(){
       if(!confirm("Reset everything?")) return;
 
-      // Reset inputs
       document.querySelectorAll("input[type='text'], input[type='date'], input[type='time']").forEach(i=>i.value="");
       document.querySelectorAll("select").forEach(s=>s.value="");
       document.querySelectorAll("textarea").forEach(t=>t.value="");
@@ -680,75 +688,145 @@
       document.querySelectorAll("input[type='file']").forEach(f=>f.value="");
       document.querySelectorAll(".thumb").forEach(t=>t.textContent="No image");
 
+      // reset observations count back to 6
+      const obsBody = document.getElementById("obsBody");
+      obsBody.innerHTML = "";
+      obsCount = 0;
+      for(let i=0;i<6;i++) addObsRow();
+
       clearSig("sigInspector");
       clearSig("sigOperator");
     }
 
-    // Init signatures
     initSig("sigInspector");
     initSig("sigOperator");
-  </script>
 
-<script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxubvRAaQEHWjob_M2EmPEqhKNpmXtSjFfatcIscWHKaWPWj5bmmFwskuLjvfzOX_K9Og/exec";
+    // ====== PDF BUILD (clones page, injects signature images, locks fields) ======
+    function buildHtmlForPdf() {
+      const clone = document.documentElement.cloneNode(true);
 
-  function buildHtmlForPdf() {
-    const clone = document.documentElement.cloneNode(true);
+      // Remove scripts
+      clone.querySelectorAll("script").forEach(s => s.remove());
 
-    // Remove buttons and file inputs
-    clone.querySelectorAll("button").forEach(b => b.remove());
-    clone.querySelectorAll('input[type="file"]').forEach(f => f.remove());
+      // Remove action buttons + file inputs (keep thumbnails)
+      clone.querySelectorAll("button").forEach(b => b.remove());
+      clone.querySelectorAll('input[type="file"]').forEach(f => f.remove());
 
-    // Copy values
-    const live = document.querySelectorAll("input, textarea, select");
-    const cloned = clone.querySelectorAll("input, textarea, select");
+      // Convert signature canvases to <img>
+      const liveInspector = document.getElementById("sigInspector");
+      const liveOperator  = document.getElementById("sigOperator");
+      const inspData = safeCanvasDataUrl(liveInspector);
+      const operData = safeCanvasDataUrl(liveOperator);
 
-    live.forEach((el, i) => {
-      const c = cloned[i];
-      if (!c) return;
+      const clonedInspector = clone.getElementById("sigInspector");
+      const clonedOperator  = clone.getElementById("sigOperator");
 
-      if (el.type === "radio" || el.type === "checkbox") {
-        c.checked = el.checked;
-        if (el.checked) c.setAttribute("checked", "checked");
-      } else {
-        c.value = el.value;
-        c.setAttribute("value", el.value);
+      if (clonedInspector) {
+        const img = document.createElement("img");
+        img.src = inspData || "";
+        img.alt = "Inspector Signature";
+        img.style.width = "100%";
+        img.style.height = "130px";
+        img.style.border = "1px solid #111";
+        img.style.borderRadius = "6px";
+        clonedInspector.replaceWith(img);
       }
-      c.setAttribute("disabled", "disabled");
-    });
 
-    // Remove scripts
-    clone.querySelectorAll("script").forEach(s => s.remove());
+      if (clonedOperator) {
+        const img = document.createElement("img");
+        img.src = operData || "";
+        img.alt = "Operator Signature";
+        img.style.width = "100%";
+        img.style.height = "130px";
+        img.style.border = "1px solid #111";
+        img.style.borderRadius = "6px";
+        clonedOperator.replaceWith(img);
+      }
 
-    return "<!DOCTYPE html>" + clone.outerHTML;
-  }
+      // Copy values from live inputs to cloned inputs
+      const live = document.querySelectorAll("input, textarea, select");
+      const cloned = clone.querySelectorAll("input, textarea, select");
 
-  async function sendEmailPdf() {
-    const qcNo = document.querySelector('[name="qcNo"]')?.value || "QC";
-    const date = document.querySelector('[name="date"]')?.value || new Date().toISOString().slice(0,10);
+      live.forEach((el, i) => {
+        const c = cloned[i];
+        if (!c) return;
 
-    const payload = {
-      subject: `QC Inspection Checklist - ${qcNo} - ${date}`,
-      filename: `QC_Inspection_${qcNo}_${date}`,
-      html: buildHtmlForPdf()
-    };
+        if (el.type === "radio" || el.type === "checkbox") {
+          c.checked = el.checked;
+          if (el.checked) c.setAttribute("checked", "checked");
+        } else {
+          c.value = el.value;
+          c.setAttribute("value", el.value);
+        }
+        c.setAttribute("disabled", "disabled");
+      });
 
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(payload)
-    });
+      // Force selected option visible in cloned selects
+      clone.querySelectorAll("select").forEach(sel => {
+        const val = sel.value;
+        Array.from(sel.options).forEach(o => {
+          if (o.value === val) o.setAttribute("selected", "selected");
+          else o.removeAttribute("selected");
+        });
+      });
 
-    const out = await res.json().catch(() => ({}));
-
-    if (out.ok) {
-      alert("Email sent successfully to saleh.shaikh@cspadt.ae");
-    } else {
-      alert("Failed to send email");
+      return "<!DOCTYPE html>" + clone.outerHTML;
     }
-  }
-</script>
 
-  
+    function safeCanvasDataUrl(canvas){
+      try{
+        // If canvas is blank, return empty
+        const ctx = canvas.getContext("2d");
+        const pixels = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+        let hasInk = false;
+        for (let i=3; i<pixels.length; i+=4){ // alpha channel
+          if (pixels[i] !== 0){ hasInk = true; break; }
+        }
+        if(!hasInk) return "";
+        return canvas.toDataURL("image/png");
+      }catch(e){
+        return "";
+      }
+    }
+
+    async function sendEmailPdf() {
+      const qcNo = document.querySelector('[name="qcNo"]')?.value?.trim() || "QC";
+      const date = document.querySelector('[name="date"]')?.value || new Date().toISOString().slice(0,10);
+
+      const payload = {
+        to: FIXED_TO_EMAIL,
+        subject: `QC Inspection Checklist - ${qcNo} - ${date}`,
+        filename: `QC_Inspection_${qcNo}_${date}.pdf`,
+        html: buildHtmlForPdf()
+      };
+
+      try{
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+
+        const out = await res.json().catch(() => ({}));
+
+        if (out && out.ok) {
+          alert("Email sent successfully to " + FIXED_TO_EMAIL);
+        } else {
+          alert("Failed to send email. Check Apps Script deployment + permissions.");
+        }
+      }catch(err){
+        alert("Failed to send email. Network/API error.");
+      }
+    }
+
+    function escapeHtml(s){
+      return String(s)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+  </script>
 </body>
 </html>
