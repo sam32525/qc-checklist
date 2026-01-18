@@ -107,10 +107,10 @@
       color:var(--csp-dark);
       text-align:center;
     }
+    td { position:relative; }
 
     .center{ text-align:center; }
     .w-sn{ width:60px; }
-    .w-item{ width:auto; }
     .w-status{ width:170px; }
     .w-remarks{ width:260px; }
     .w-photo{ width:260px; }
@@ -162,10 +162,6 @@
       overflow:auto;
       box-sizing:border-box;
     }
-
-    /* Highlight Yes/No */
-    input[value="No"]:checked{ accent-color:#c0392b; }
-    input[value="Yes"]:checked{ accent-color:#1e8e3e; }
 
     /* Signatures */
     .sign-grid{
@@ -288,10 +284,8 @@
         <div class="title">Quay Crane (QC) Inspection Checklist</div>
       </div>
 
-      <!-- IMPORTANT: upload your logo file to GitHub repo root (same folder as index.html)
-           Your file name is: COSCO Logo_H.png
-           Keep EXACT name, and use %20 for space -->
-      <img class="hdr-logo" src="logo.png" alt="COSCO Logo">
+      <!-- IMPORTANT: Put this file in the SAME repo folder -->
+      <img class="hdr-logo" src="COSCO Logo_H.png" alt="COSCO Logo">
     </div>
 
     <!-- META -->
@@ -342,11 +336,11 @@
 
     <!-- CHECKLIST -->
     <div class="section-title">A. PRE-OPERATION & SAFETY CONTROLS</div>
-    <table id="checklist">
+    <table>
       <thead>
         <tr>
           <th class="w-sn">S/N</th>
-          <th class="w-item">Inspection Item</th>
+          <th>Inspection Item</th>
           <th class="w-status">Status</th>
           <th class="w-remarks">Remarks</th>
           <th class="w-photo">Photo (Optional)</th>
@@ -358,7 +352,7 @@
     <!-- OBSERVATIONS / RECOMMENDATIONS -->
     <div class="section-title">B. OBSERVATIONS & RECOMMENDATIONS</div>
 
-    <table id="obsTable">
+    <table>
       <thead>
         <tr>
           <th class="w-sn">S/N</th>
@@ -373,8 +367,8 @@
     </table>
 
     <div class="obs-actions">
-      <button type="button" class="secondary" onclick="addObsRow()">Add Observation Row</button>
-      <button type="button" class="secondary" onclick="removeObsRow()">Remove Last Row</button>
+      <button type="button" class="secondary" id="btnAddObs">Add Observation Row</button>
+      <button type="button" class="secondary" id="btnRemObs">Remove Last Row</button>
     </div>
 
     <!-- SIGNATURES -->
@@ -384,7 +378,7 @@
         <h4>Inspector Signature</h4>
         <canvas id="sigInspector"></canvas>
         <div class="sig-actions">
-          <button type="button" class="secondary" onclick="clearSig('sigInspector')">Clear</button>
+          <button type="button" class="secondary" id="btnClearInsp">Clear</button>
         </div>
       </div>
 
@@ -392,15 +386,15 @@
         <h4>Operator Signature</h4>
         <canvas id="sigOperator"></canvas>
         <div class="sig-actions">
-          <button type="button" class="secondary" onclick="clearSig('sigOperator')">Clear</button>
+          <button type="button" class="secondary" id="btnClearOper">Clear</button>
         </div>
       </div>
     </div>
 
     <!-- ACTIONS -->
     <div class="actions">
-      <button type="button" onclick="sendEmailPdf()">Send Email (PDF)</button>
-      <button type="button" class="secondary" onclick="resetForm()">Reset</button>
+      <button type="button" id="btnSendPdf">Send Email (PDF)</button>
+      <button type="button" class="secondary" id="btnReset">Reset</button>
     </div>
 
     <!-- FOOTER -->
@@ -423,17 +417,11 @@
   </div>
 
   <script>
-    // =========================
-    // 1) GOOGLE APPS SCRIPT URL (YOUR WEB APP URL)
-    // =========================
-    // IMPORTANT:
-    // This must be the Apps Script **Web App** URL (Deploy -> Web app).
-    // If you pasted the correct URL, "Send Email (PDF)" will work.
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxubvRAaQEHWjob_M2EmPEqhKNpmXtSjFfatcIscWHKaWPWj5bmmFwskuLjvfzOX_K9Og/exec";
+    // ====== SET YOUR APPS SCRIPT WEB APP URL HERE ======
+    // Must end with /exec
+    const SCRIPT_URL = "PASTE_YOUR_WEB_APP_URL_HERE";
 
-    // =========================
-    // 2) CHECKLIST ITEMS
-    // =========================
+    // ====== CHECKLIST ITEMS (your full list) ======
     const items = [
       "QC isolation / lock-out not required (machine in safe state before checks)",
       "Operator fit for duty (no fatigue / impairment)",
@@ -471,6 +459,7 @@
       "Sheaves condition (no abnormal wear / cracks)",
       "Sheave guards in place",
       "Drum grooves OK / no sharp edges",
+      "Rope end connections secure",
       "Rope end connections secure",
       "Spreader condition (no damage / deformation)",
       "Twistlocks operate smoothly (lock/unlock)",
@@ -538,13 +527,19 @@
       "All alarms function during movement (as applicable)"
     ];
 
-    // =========================
-    // 3) RENDER CHECKLIST
-    // =========================
+    function escapeHtml(s){
+      return String(s)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
     function createChecklistRow(sn, text){
       const idBase = "row" + sn;
       return `
-        <tr data-row="${sn}">
+        <tr>
           <td class="center">${sn}</td>
           <td>${escapeHtml(text)}</td>
           <td class="center">
@@ -552,31 +547,28 @@
             <label class="opt"><input type="radio" name="${idBase}_status" value="No"><span>No</span></label>
             <label class="opt"><input type="radio" name="${idBase}_status" value="N/A"><span>N/A</span></label>
           </td>
-          <td>
-            <textarea class="chk-remarks" name="${idBase}_remarks" placeholder="Remarks / defect details..."></textarea>
-          </td>
+          <td><textarea class="chk-remarks" name="${idBase}_remarks" placeholder="Remarks / defect details..."></textarea></td>
           <td>
             <div class="photo-cell">
-              <input type="file" accept="image/*" onchange="previewPhoto(event,'${idBase}_img')">
-              <div class="thumb" id="${idBase}_img" data-img="">No image</div>
+              <input type="file" accept="image/*" data-photo onchange="previewPhoto(event,'${idBase}_img')">
+              <div class="thumb" id="${idBase}_img">No image</div>
             </div>
           </td>
         </tr>
       `;
     }
 
-    const tbody = document.getElementById("checklistBody");
-    tbody.innerHTML = items.map((t,i)=>createChecklistRow(i+1,t)).join("");
+    // Render checklist
+    document.getElementById("checklistBody").innerHTML =
+      items.map((t,i)=>createChecklistRow(i+1,t)).join("");
 
-    // =========================
-    // 4) OBSERVATIONS (ADD/REMOVE) + PHOTO
-    // =========================
+    // ===== Observations (add/remove) =====
     let obsCount = 0;
 
     function createObsRow(sn){
       const idBase = "obs" + sn;
       return `
-        <tr data-obs="${sn}">
+        <tr>
           <td class="center">${sn}</td>
           <td><textarea class="obs-ta" name="${idBase}_obs" placeholder="Describe issue..."></textarea></td>
           <td><textarea class="rec-ta" name="${idBase}_rec" placeholder="Action required..."></textarea></td>
@@ -584,8 +576,8 @@
           <td><input type="text" name="${idBase}_resp" placeholder="Name/Dept"></td>
           <td>
             <div class="photo-cell">
-              <input type="file" accept="image/*" onchange="previewPhoto(event,'${idBase}_img')">
-              <div class="thumb" id="${idBase}_img" data-img="">No image</div>
+              <input type="file" accept="image/*" data-photo onchange="previewPhoto(event,'${idBase}_img')">
+              <div class="thumb" id="${idBase}_img">No image</div>
             </div>
           </td>
         </tr>
@@ -594,50 +586,39 @@
 
     function addObsRow(){
       obsCount += 1;
-      document.getElementById("obsBody").insertAdjacentHTML("beforeend", createObsRow(obsCount));
+      document.getElementById("obsBody")
+        .insertAdjacentHTML("beforeend", createObsRow(obsCount));
     }
 
     function removeObsRow(){
-      const obsBody = document.getElementById("obsBody");
       if(obsCount <= 1) return;
+      const obsBody = document.getElementById("obsBody");
       obsBody.removeChild(obsBody.lastElementChild);
       obsCount -= 1;
     }
 
-    // Start with 6 rows
-    (function initObs(){
-      for(let i=0;i<6;i++) addObsRow();
-    })();
+    // start with 6 rows
+    for(let i=0;i<6;i++) addObsRow();
 
-    // =========================
-    // 5) PHOTO PREVIEW (SAVES BASE64 INTO data-img)
-    // =========================
+    // ===== Photo preview (base64 so PDF includes it) =====
     function previewPhoto(event, targetId){
       const file = event.target.files && event.target.files[0];
       const box = document.getElementById(targetId);
-      if(!file){
-        box.textContent = "No image";
-        box.dataset.img = "";
-        return;
-      }
+      if(!file){ box.textContent = "No image"; return; }
 
       const img = document.createElement("img");
       img.alt = "Photo";
 
       const reader = new FileReader();
       reader.onload = (e) => {
-        const dataUrl = e.target.result;     // base64
         box.innerHTML = "";
-        img.src = dataUrl;
+        img.src = e.target.result;   // base64 data URL
         box.appendChild(img);
-        box.dataset.img = dataUrl;           // keep base64 for PDF/template
       };
       reader.readAsDataURL(file);
     }
 
-    // =========================
-    // 6) SIGNATURE PAD
-    // =========================
+    // ===== Signature pad =====
     function initSig(canvasId){
       const canvas = document.getElementById(canvasId);
       const ctx = canvas.getContext("2d");
@@ -656,14 +637,12 @@
       window.addEventListener("resize", resize);
 
       let drawing = false;
-
       function pos(e){
         const rect = canvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         return { x: clientX - rect.left, y: clientY - rect.top };
       }
-
       function start(e){
         drawing = true;
         const p = pos(e);
@@ -678,10 +657,7 @@
         ctx.stroke();
         e.preventDefault();
       }
-      function end(e){
-        drawing = false;
-        e.preventDefault();
-      }
+      function end(e){ drawing = false; e.preventDefault(); }
 
       canvas.addEventListener("mousedown", start);
       canvas.addEventListener("mousemove", move);
@@ -698,9 +674,6 @@
       ctx.clearRect(0,0,canvas.width,canvas.height);
     }
 
-    initSig("sigInspector");
-    initSig("sigOperator");
-
     function safeCanvasDataUrl(canvas){
       try{
         const ctx = canvas.getContext("2d");
@@ -716,9 +689,116 @@
       }
     }
 
-    // =========================
-    // 7) RESET
-    // =========================
+    initSig("sigInspector");
+    initSig("sigOperator");
+
+    // ===== Build HTML snapshot for PDF =====
+    function buildHtmlForPdf(){
+      // clone the page only (not full document) => avoids broken indexes
+      const pageClone = document.querySelector(".page").cloneNode(true);
+
+      // remove buttons + file inputs
+      pageClone.querySelectorAll("button").forEach(b => b.remove());
+      pageClone.querySelectorAll('input[type="file"]').forEach(f => f.remove());
+
+      // convert signature canvas to images
+      const insp = safeCanvasDataUrl(document.getElementById("sigInspector"));
+      const oper = safeCanvasDataUrl(document.getElementById("sigOperator"));
+
+      const cInsp = pageClone.querySelector("#sigInspector");
+      const cOper = pageClone.querySelector("#sigOperator");
+
+      if (cInsp){
+        const img = document.createElement("img");
+        img.src = insp || "";
+        img.style.width="100%"; img.style.height="130px";
+        img.style.border="1px solid #111"; img.style.borderRadius="6px";
+        cInsp.replaceWith(img);
+      }
+      if (cOper){
+        const img = document.createElement("img");
+        img.src = oper || "";
+        img.style.width="100%"; img.style.height="130px";
+        img.style.border="1px solid #111"; img.style.borderRadius="6px";
+        cOper.replaceWith(img);
+      }
+
+      // copy values: match elements by name/id rather than index (more stable)
+      const liveEls = document.querySelectorAll(".page input, .page textarea, .page select");
+      liveEls.forEach(live => {
+        const name = live.getAttribute("name");
+        const id = live.getAttribute("id");
+        const selector = name ? `[name="${CSS.escape(name)}"]` : (id ? `#${CSS.escape(id)}` : null);
+        if(!selector) return;
+
+        const cloned = pageClone.querySelector(selector);
+        if(!cloned) return;
+
+        if (live.type === "radio" || live.type === "checkbox") {
+          cloned.checked = live.checked;
+          if (live.checked) cloned.setAttribute("checked","checked");
+        } else if (live.tagName === "TEXTAREA") {
+          cloned.textContent = live.value;
+        } else {
+          cloned.value = live.value;
+          cloned.setAttribute("value", live.value);
+        }
+        cloned.setAttribute("disabled","disabled");
+      });
+
+      // fix selected option
+      pageClone.querySelectorAll("select").forEach(sel => {
+        const val = sel.value;
+        Array.from(sel.options).forEach(o => {
+          if (o.value === val) o.setAttribute("selected","selected");
+          else o.removeAttribute("selected");
+        });
+      });
+
+      // build full html with styles copied from current page
+      const styles = Array.from(document.querySelectorAll("style")).map(s => s.outerHTML).join("\n");
+      return `<!doctype html><html><head><meta charset="utf-8">${styles}</head><body>${pageClone.outerHTML}</body></html>`;
+    }
+
+    // ===== Send PDF via Apps Script (returns JSON) =====
+    async function sendEmailPdf(){
+      if (!SCRIPT_URL || SCRIPT_URL.includes("PASTE_YOUR_WEB_APP_URL_HERE")){
+        alert("Paste your Apps Script Web App URL into SCRIPT_URL first.");
+        return;
+      }
+
+      const qcNo = document.querySelector('[name="qcNo"]')?.value?.trim() || "QC";
+      const date = document.querySelector('[name="date"]')?.value || new Date().toISOString().slice(0,10);
+
+      const payload = {
+        qcNo,
+        date,
+        subject: `QC Inspection Checklist - ${qcNo} - ${date}`,
+        filename: `QC_Inspection_${qcNo}_${date}.pdf`,
+        html: buildHtmlForPdf()
+      };
+
+      try{
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type":"text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+
+        const text = await res.text();
+        let out = {};
+        try { out = JSON.parse(text); } catch(e){}
+
+        if (out.ok){
+          alert("PDF email sent successfully.");
+        } else {
+          alert("Send failed: " + (out.error || text));
+        }
+      }catch(err){
+        alert("ERROR: " + err.message);
+      }
+    }
+
     function resetForm(){
       if(!confirm("Reset everything?")) return;
 
@@ -727,15 +807,9 @@
       document.querySelectorAll("textarea").forEach(t=>t.value="");
       document.querySelectorAll("input[type='radio']").forEach(r=>r.checked=false);
       document.querySelectorAll("input[type='file']").forEach(f=>f.value="");
-      document.querySelectorAll(".thumb").forEach(t=>{
-        t.textContent="No image";
-        t.dataset.img="";
-        t.innerHTML="No image";
-      });
+      document.querySelectorAll(".thumb").forEach(t=>t.textContent="No image");
 
-      // reset observations back to 6 rows
-      const obsBody = document.getElementById("obsBody");
-      obsBody.innerHTML = "";
+      document.getElementById("obsBody").innerHTML = "";
       obsCount = 0;
       for(let i=0;i<6;i++) addObsRow();
 
@@ -743,99 +817,13 @@
       clearSig("sigOperator");
     }
 
-    // =========================
-    // 8) SEND EMAIL (TEMPLATE MODE)
-    //    Sends ONLY DATA to Apps Script.
-    //    Apps Script template creates PDF and attaches it.
-    // =========================
-    async function sendEmailPdf(){
-      try{
-        const qcNo = (document.querySelector('[name="qcNo"]')?.value || "QC").trim() || "QC";
-        const date = document.querySelector('[name="date"]')?.value || new Date().toISOString().slice(0,10);
-
-        // Collect checklist rows
-        const checklist = [];
-        document.querySelectorAll("#checklistBody tr").forEach((tr, idx) => {
-          const sn = idx + 1;
-          const itemText = tr.children[1]?.innerText || "";
-          const status = tr.querySelector('input[type="radio"]:checked')?.value || "";
-          const remarks = tr.querySelector("textarea")?.value || "";
-          const photoBase64 = tr.querySelector(".thumb")?.dataset?.img || "";
-          checklist.push({ sn, text: itemText, status, remarks, photo: photoBase64 });
-        });
-
-        // Collect observations rows
-        const observations = [];
-        document.querySelectorAll("#obsBody tr").forEach((tr, idx) => {
-          const sn = idx + 1;
-          const obs = tr.querySelector('textarea[name^="obs"]')?.value || tr.children[1]?.querySelector("textarea")?.value || "";
-          const rec = tr.querySelector('textarea[name^="obs"]')?.value || tr.children[2]?.querySelector("textarea")?.value || "";
-          const targetDate = tr.children[3]?.querySelector("input")?.value || "";
-          const responsible = tr.children[4]?.querySelector("input")?.value || "";
-          const photoBase64 = tr.querySelector(".thumb")?.dataset?.img || "";
-          observations.push({ sn, obs, rec, targetDate, responsible, photo: photoBase64 });
-        });
-
-        const payload = {
-          // email/pdf naming
-          subject: `QC Inspection Checklist - ${qcNo} - ${date}`,
-          filename: `QC_Inspection_${qcNo}_${date}`,
-
-          // meta fields
-          qcNo: document.querySelector('[name="qcNo"]')?.value || "",
-          date: document.querySelector('[name="date"]')?.value || "",
-          shift: document.querySelector('[name="shift"]')?.value || "",
-          time: document.querySelector('[name="time"]')?.value || "",
-          operator: document.querySelector('[name="operator"]')?.value || "",
-          inspector: document.querySelector('[name="inspector"]')?.value || "",
-          weather: document.querySelector('[name="weather"]')?.value || "",
-          wind: document.querySelector('[name="wind"]')?.value || "",
-          generalComments: document.querySelector('[name="generalComments"]')?.value || "",
-
-          // footer
-          docNo: document.querySelector('[name="docNo"]')?.value || "",
-          revNo: document.querySelector('[name="revNo"]')?.value || "",
-          effDate: document.querySelector('[name="effDate"]')?.value || "",
-          pageNo: document.querySelector('[name="pageNo"]')?.value || "",
-
-          // data tables
-          checklist,
-          observations,
-
-          // signatures
-          sigInspector: safeCanvasDataUrl(document.getElementById("sigInspector")),
-          sigOperator: safeCanvasDataUrl(document.getElementById("sigOperator"))
-        };
-
-        const res = await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
-        });
-
-        const text = await res.text();
-        let out = {};
-        try{ out = JSON.parse(text); } catch(e){}
-
-        if(out && out.ok){
-          alert("Sent successfully (PDF attachment) to saleh.shaikh@cspadt.ae");
-        } else {
-          alert("Send failed: " + (out.error || text || "Unknown error"));
-        }
-
-      }catch(err){
-        alert("ERROR: " + err.message);
-      }
-    }
-
-    function escapeHtml(s){
-      return String(s)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
+    // Buttons
+    document.getElementById("btnAddObs").addEventListener("click", addObsRow);
+    document.getElementById("btnRemObs").addEventListener("click", removeObsRow);
+    document.getElementById("btnClearInsp").addEventListener("click", () => clearSig("sigInspector"));
+    document.getElementById("btnClearOper").addEventListener("click", () => clearSig("sigOperator"));
+    document.getElementById("btnReset").addEventListener("click", resetForm);
+    document.getElementById("btnSendPdf").addEventListener("click", sendEmailPdf);
   </script>
 </body>
 </html>
