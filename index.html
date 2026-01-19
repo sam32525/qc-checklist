@@ -342,14 +342,8 @@ td{vertical-align:top;}
     /* Highlight NO selections */
     input[type="radio"][value="No"]:checked { accent-color:#c0392b; }
 
-    }
-    input[value="Yes"]:checked{
-      accent-color:#1e8e3e;
-    }
-
-
-    
-    
+    input[value="Yes"]:checked{  accent-color:#1e8e3e; }
+  
     /* --- Footer INSIDE page border (like your sample) --- */
     .page{
       position:relative;
@@ -1344,14 +1338,141 @@ td{vertical-align:top;}
       setupPad('sig2','sig_hsseManager');
     });
   
-    function sendForm(){
-      alert("Form is ready to send.\n\nThis button can be connected to email, WhatsApp, or server later.");
-      // Example email draft (works if user has mail client configured)
-      const subject = encodeURIComponent("QC Inspection Checklist Submission");
-      const body = encodeURIComponent("Please find the completed QC Inspection Checklist attached.\n\n(Attach the saved PDF)");
-      window.location.href = "mailto:?subject=" + subject + "&body=" + body;
+  <script>
+  // 0) Put your deployed Apps Script Web App URL here (must end with /exec)
+  const SCRIPT_URL = "PASTE_YOUR_GOOGLE_WEBAPP_URL_HERE";
+
+  // Photo preview (your existing code)
+  document.addEventListener('change', function(e){
+    const inp = e.target;
+    if(inp && inp.matches('input[type="file"][data-preview]')){
+      const id = inp.getAttribute('data-preview');
+      const box = document.getElementById(id);
+      const file = inp.files && inp.files[0];
+      if(!box) return;
+      if(!file){ box.textContent = "No image"; return; }
+      const url = URL.createObjectURL(file);
+      box.innerHTML = '<img alt="preview" src="' + url + '">';
+    }
+  });
+
+  function resetAll(){
+    if(confirm("Clear everything?")){
+      document.getElementById('qcForm').reset();
+      document.querySelectorAll('.thumb').forEach(t => t.textContent = "No image");
+      clearSig('sig1','sig_hseInspector');
+      clearSig('sig2','sig_hsseManager');
+    }
+  }
+
+  // Digital signature pads (your existing code)
+  function setupPad(canvasId, hiddenId){
+    const canvas = document.getElementById(canvasId);
+    const hidden = document.getElementById(hiddenId);
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    function resize(){
+      const rect = canvas.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = Math.floor(rect.width * ratio);
+      canvas.height = Math.floor(rect.height * ratio);
+      ctx.setTransform(ratio,0,0,ratio,0,0);
+      ctx.lineWidth = 2.2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = '#000';
     }
 
+    function pos(ev){
+      const r = canvas.getBoundingClientRect();
+      const e = ev.touches ? ev.touches[0] : ev;
+      return { x: e.clientX - r.left, y: e.clientY - r.top };
+    }
+
+    function start(ev){ ev.preventDefault(); drawing = true; const p = pos(ev); ctx.beginPath(); ctx.moveTo(p.x,p.y); }
+    function move(ev){ if(!drawing) return; ev.preventDefault(); const p = pos(ev); ctx.lineTo(p.x,p.y); ctx.stroke(); }
+    function end(ev){
+      if(!drawing) return;
+      ev.preventDefault();
+      drawing = false;
+      if(hidden) hidden.value = canvas.toDataURL('image/png');
+    }
+
+    canvas.addEventListener('mousedown', start);
+    canvas.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', end);
+
+    canvas.addEventListener('touchstart', start, {passive:false});
+    canvas.addEventListener('touchmove', move, {passive:false});
+    window.addEventListener('touchend', end, {passive:false});
+
+    resize();
+    window.addEventListener('resize', resize);
+  }
+
+  function clearSig(canvasId, hiddenId){
+    const c = document.getElementById(canvasId);
+    const ctx = c.getContext('2d');
+    ctx.clearRect(0,0,c.width,c.height);
+    const h = document.getElementById(hiddenId);
+    if(h) h.value = '';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setupPad('sig1','sig_hseInspector');
+    setupPad('sig2','sig_hsseManager');
+  });
+
+  // Convert file input -> base64 (so Apps Script can embed images into PDF)
+  function fileToDataURL(file) {
+    return new Promise((resolve) => {
+      if (!file) return resolve("");
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = () => resolve("");
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ✅ THIS is the real SEND (to Apps Script)
+  async function sendForm() {
+    const form = document.getElementById("qcForm");
+    const fd = new FormData(form);
+
+    // Add title
+    fd.append("formTitle", "Quay Crane (QC) Inspection Checklist");
+
+    // Checklist photos c1..c30
+    for (let i = 1; i <= 30; i++) {
+      const input = form.querySelector(`input[type="file"][data-preview="c${i}"]`);
+      const file = input && input.files && input.files[0] ? input.files[0] : null;
+      const dataUrl = await fileToDataURL(file);
+      fd.append(`photo_c${i}`, dataUrl);
+    }
+
+    // Observation photos o1..o10
+    for (let i = 1; i <= 10; i++) {
+      const input = form.querySelector(`input[type="file"][data-preview="o${i}"]`);
+      const file = input && input.files && input.files[0] ? input.files[0] : null;
+      const dataUrl = await fileToDataURL(file);
+      fd.append(`photo_o${i}`, dataUrl);
+    }
+
+    // Basic validation
+    if (!SCRIPT_URL || SCRIPT_URL.includes("PASTE_")) {
+      alert("SCRIPT_URL is not set. Paste your Google Web App /exec URL.");
+      return;
+    }
+
+    try {
+      await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: fd });
+      alert("Submitted successfully. PDF will be emailed to you.");
+    } catch (e) {
+      alert("Submit failed. Check SCRIPT_URL and Apps Script deployment.");
+    }
+  }
+</script>
 </script>
 </body>
 </html>
