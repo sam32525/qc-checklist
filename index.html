@@ -1,829 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Quay Crane (QC) Inspection Checklist - Complete Form</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QC Inspection Checklist</title>
+
+  <!-- Include html2pdf -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"
+    integrity="sha512-MpDFIChbcXl2QgipQrt1VcPHMldRILetapBl5MPCA9Y8r7qvlwx1/Mc9hNTzY+kS5kX6PdoDq41ws1HiVNLdZA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Include SMTP.js -->
+  <script src="https://smtpjs.com/v3/smtp.js"></script>
 
   <style>
-    :root{
-      --csp-blue:#0b4f8a;
-      --csp-light:#e8f1fb;
-      --csp-grey:#f2f2f2;
-      --csp-dark:#1f2937;
-      --line:#111;
-      --soft:#6b7280;
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
     }
-
-    body{
-      font-family: Arial, Helvetica, sans-serif;
-      background:#f4f6f8;
-      padding:20px;
-      color:#000;
+    .container {
+      max-width: 900px;
+      margin: auto;
     }
-
-    .page{
-      max-width: 1200px;
-      margin:auto;
-      background:#fff;
-      border:1px solid var(--line);
-      padding:18px;
-      position:relative;
-      padding-bottom:170px; /* reserve for footer */
+    input, textarea, select {
+      width: 100%;
+      margin-top: 8px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
     }
-
-    /* Header */
-    .header-with-logo{
-      display:grid;
-      grid-template-columns: 1fr auto;
-      align-items:center;
-      gap:16px;
-      border-bottom:3px solid var(--csp-blue);
-      padding-bottom:10px;
-      margin-bottom:12px;
+    label {
+      margin-top: 12px;
+      font-weight: bold;
+      display: block;
     }
-    .header-text{ display:flex; flex-direction:column; gap:6px; }
-    .org{
-      font-size:18px;
-      font-weight:700;
-      color:var(--csp-blue);
-    }
-    .title{
-      font-size:15px;
-      font-weight:700;
-      text-decoration:underline;
-      color:var(--csp-dark);
-    }
-    .hdr-logo{
-      height:75px;
-      width:auto;
-      justify-self:end;
-    }
-
-    /* Meta */
-    .meta{
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap:10px;
-      margin: 14px 0 12px;
-    }
-    .field label{
-      font-size:12px;
-      font-weight:700;
-      display:block;
-      margin-bottom:4px;
-    }
-    input[type="text"], input[type="date"], input[type="time"], select, textarea{
-      width:100%;
-      border:1px solid #666;
-      border-radius:4px;
-      padding:6px;
-      font-size:13px;
-      box-sizing:border-box;
-    }
-    textarea{ resize:vertical; }
-
-    /* Section title */
-    .section-title{
-      text-align:center;
-      font-weight:700;
-      margin:18px 0 8px;
-      background:var(--csp-light);
-      border:1px solid var(--csp-blue);
-      color:var(--csp-blue);
-      padding:6px 10px;
-    }
-
-    /* Tables */
-    table{ width:100%; border-collapse:collapse; }
-    th, td{
-      border:1px solid var(--line);
-      padding:8px;
-      font-size:13px;
-      vertical-align:top;
-    }
-    th{
-      background:var(--csp-grey);
-      color:var(--csp-dark);
-      text-align:center;
-    }
-    td { position:relative; }
-
-    .center{ text-align:center; }
-    .w-sn{ width:60px; }
-    .w-status{ width:170px; }
-    .w-remarks{ width:260px; }
-    .w-photo{ width:260px; }
-
-    .opt{
-      margin-right:10px;
-      white-space:nowrap;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-    }
-
-    /* Photo cell */
-    .photo-cell{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      align-items:stretch;
-    }
-    .photo-cell input[type="file"]{
-      width:100%;
-      font-size:12px;
-    }
-    .thumb{
-      height:110px;
-      border:1px dashed #777;
-      background:#fff;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:12px;
-      color:#666;
-      overflow:hidden;
-    }
-    .thumb img{ width:100%; height:100%; object-fit:contain; }
-
-    /* Textareas */
-    .chk-remarks{
-      height:70px;
-      min-height:70px;
-      max-height:180px;
-      overflow:auto;
-      box-sizing:border-box;
-    }
-    .obs-ta, .rec-ta{
-      height:110px;
-      min-height:110px;
-      max-height:240px;
-      overflow:auto;
-      box-sizing:border-box;
-    }
-
-    /* Signatures */
-    .sign-grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:16px;
-      margin-top:10px;
-    }
-    .sigbox{
-      border:1px solid var(--line);
-      padding:10px;
-      border-radius:8px;
-    }
-    .sigbox h4{
-      margin:0 0 8px;
-      font-size:13px;
-      color:var(--csp-dark);
-    }
-    canvas{
-      width:100%;
-      height:130px;
-      border:1px solid var(--line);
-      border-radius:6px;
-      background:#fff;
-      touch-action:none;
-    }
-    .sig-actions{
-      display:flex;
-      gap:10px;
-      margin-top:8px;
-      justify-content:flex-end;
-      flex-wrap:wrap;
-    }
-
-    button{
-      padding:8px 14px;
-      font-size:14px;
-      border:1px solid var(--csp-blue);
-      background:var(--csp-blue);
-      color:#fff;
-      border-radius:8px;
-      cursor:pointer;
-    }
-    button.secondary{
-      background:#fff;
-      color:var(--csp-blue);
-    }
-
-    .actions{
-      margin-top:18px;
-      display:flex;
-      justify-content:center;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .obs-actions{
-      display:flex;
-      justify-content:flex-end;
-      gap:10px;
-      margin:8px 0 0;
-      flex-wrap:wrap;
-    }
-
-    /* Footer inside border */
-    .footer{
-      position:absolute;
-      left:18px;
-      right:18px;
-      bottom:18px;
-      background:#fff;
-      z-index:2;
-    }
-    .footer-table{
-      width:100% !important;
-      border-collapse:collapse;
-      table-layout:fixed;
-      font-size:12px;
-    }
-    .footer-table th, .footer-table td{
-      border:1px solid var(--soft);
-      padding:6px 8px;
-      text-align:center;
-    }
-    .footer-table th{
-      background:#fff !important;
-      color:var(--soft);
-      font-weight:700;
-    }
-    .footer-table td{
-      font-weight:600;
-      color:#4b5563;
-    }
-    .footer-table td input{
-      border:0;
-      width:100%;
-      font-size:12px;
-      padding:0;
-      background:transparent;
-      text-align:center;
-    }
-
-    @media print{
-      body{ background:#fff; padding:0; }
-      .actions, .sig-actions, .obs-actions{ display:none !important; }
-      input, textarea, select{ border:0 !important; }
-      .photo-cell input{ display:none !important; }
-      .page{ border:none; padding-bottom:0; }
-      .footer{ position:fixed; left:18px; right:18px; bottom:12px; }
+    .btn {
+      margin-top: 20px;
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
   </style>
 </head>
-
 <body>
-  <div class="page">
-    <!-- HEADER -->
-    <div class="header-with-logo">
-      <div class="header-text">
-        <div class="org">CSP Abu Dhabi Terminal Environment, Health and Safety Management</div>
-        <div class="title">Quay Crane (QC) Inspection Checklist</div>
-      </div>
 
-      <!-- IMPORTANT: Put this file in the SAME repo folder -->
-      <img class="hdr-logo" src="COSCO Logo_H.png" alt="COSCO Logo">
-    </div>
+<div class="container" id="pdfContent">
 
-    <!-- META -->
-    <div class="meta">
-      <div class="field">
-        <label>QC No.</label>
-        <input type="text" name="qcNo" placeholder="e.g., QC-101" />
-      </div>
-      <div class="field">
-        <label>Date</label>
-        <input type="date" name="date" />
-      </div>
-      <div class="field">
-        <label>Shift</label>
-        <select name="shift">
-          <option value="">Select</option>
-          <option>Day</option>
-          <option>Night</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Inspection Time</label>
-        <input type="time" name="time" />
-      </div>
+  <h1 style="text-align:center;">QC Inspection Checklist</h1>
 
-      <div class="field">
-        <label>Operator Name</label>
-        <input type="text" name="operator" placeholder="Operator name" />
-      </div>
-      <div class="field">
-        <label>Inspector Name</label>
-        <input type="text" name="inspector" placeholder="Inspector name" />
-      </div>
-      <div class="field">
-        <label>Weather / Visibility</label>
-        <input type="text" name="weather" placeholder="Clear / Fog / Rain / Windy" />
-      </div>
-      <div class="field">
-        <label>Wind Speed (if applicable)</label>
-        <input type="text" name="wind" placeholder="e.g., 18 km/h" />
-      </div>
+  <form id="qcForm">
 
-      <div class="field" style="grid-column: span 4;">
-        <label>General Comments (if any)</label>
-        <textarea name="generalComments" placeholder="Write any general notes..."></textarea>
-      </div>
-    </div>
+    <!-- Example fields (replace with your actual fields) -->
+    <label for="inspectorName">Inspector Name</label>
+    <input type="text" id="inspectorName" name="inspectorName"/>
 
-    <!-- CHECKLIST -->
-    <div class="section-title">A. PRE-OPERATION & SAFETY CONTROLS</div>
-    <table>
-      <thead>
-        <tr>
-          <th class="w-sn">S/N</th>
-          <th>Inspection Item</th>
-          <th class="w-status">Status</th>
-          <th class="w-remarks">Remarks</th>
-          <th class="w-photo">Photo (Optional)</th>
-        </tr>
-      </thead>
-      <tbody id="checklistBody"></tbody>
-    </table>
+    <label for="inspectionDate">Date</label>
+    <input type="date" id="inspectionDate" name="inspectionDate"/>
 
-    <!-- OBSERVATIONS / RECOMMENDATIONS -->
-    <div class="section-title">B. OBSERVATIONS & RECOMMENDATIONS</div>
+    <label for="location">Location</label>
+    <input type="text" id="location" name="location"/>
 
-    <table>
-      <thead>
-        <tr>
-          <th class="w-sn">S/N</th>
-          <th>Observation / Defect</th>
-          <th>Recommendation / Action Required</th>
-          <th style="width:180px;">Target Date</th>
-          <th style="width:180px;">Responsible</th>
-          <th class="w-photo">Photo (Optional)</th>
-        </tr>
-      </thead>
-      <tbody id="obsBody"></tbody>
-    </table>
+    <label for="findings">Findings</label>
+    <textarea id="findings" name="findings" rows="4"></textarea>
 
-    <div class="obs-actions">
-      <button type="button" class="secondary" id="btnAddObs">Add Observation Row</button>
-      <button type="button" class="secondary" id="btnRemObs">Remove Last Row</button>
-    </div>
+    <label for="remarks">Remarks</label>
+    <textarea id="remarks" name="remarks" rows="4"></textarea>
 
-    <!-- SIGNATURES -->
-    <div class="section-title">C. SIGNATURES</div>
-    <div class="sign-grid">
-      <div class="sigbox">
-        <h4>Inspector Signature</h4>
-        <canvas id="sigInspector"></canvas>
-        <div class="sig-actions">
-          <button type="button" class="secondary" id="btnClearInsp">Clear</button>
-        </div>
-      </div>
+    <button type="button" class="btn" onclick="handleSubmit()">Submit</button>
 
-      <div class="sigbox">
-        <h4>Operator Signature</h4>
-        <canvas id="sigOperator"></canvas>
-        <div class="sig-actions">
-          <button type="button" class="secondary" id="btnClearOper">Clear</button>
-        </div>
-      </div>
-    </div>
+  </form>
 
-    <!-- ACTIONS -->
-    <div class="actions">
-      <button type="button" id="btnSendPdf">Send Email (PDF)</button>
-      <button type="button" class="secondary" id="btnReset">Reset</button>
-    </div>
+  <p id="status"></p>
 
-    <!-- FOOTER -->
-    <div class="footer">
-      <table class="footer-table">
-        <tr>
-          <th>Document No.</th>
-          <th>Revision</th>
-          <th>Effective Date</th>
-          <th>Page</th>
-        </tr>
-        <tr>
-          <td><input type="text" name="docNo" value="CSPADT-HSE-FM-___" /></td>
-          <td><input type="text" name="revNo" value="00" /></td>
-          <td><input type="text" name="effDate" value="YYYY-MM-DD" /></td>
-          <td><input type="text" name="pageNo" value="1 of 1" /></td>
-        </tr>
-      </table>
-    </div>
-  </div>
+</div>
 
-  <script>
-    // ====== SET YOUR APPS SCRIPT WEB APP URL HERE ======
-    // Must end with /exec
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyiTMKRDbE_tJ5ZSZckTIqOA5IfKVjNphAfVyZFWkhZKEeCQ69O1nbWfcCIQGnuZnaq5Q/exec";
+<script>
+async function handleSubmit() {
+  document.getElementById('status').textContent = "Generating PDF...";
 
-    // ====== CHECKLIST ITEMS (your full list) ======
-    const items = [
-      "QC isolation / lock-out not required (machine in safe state before checks)",
-      "Operator fit for duty (no fatigue / impairment)",
-      "Work area clear of unauthorized personnel",
-      "Access ladders / walkways clean and safe",
-      "Housekeeping on platform and walkways (no slips/trips)",
-      "Adequate lighting available (cab / access / platforms)",
-      "PPE compliance (helmet, shoes, vest, etc.)",
-      "Emergency stop buttons functional (test as per procedure)",
-      "Horn / audible alarm functional",
-      "Flashing beacon / warning lights functional",
-      "Radio communication functional",
-      "CCTV / monitoring screens operational (if applicable)",
-      "Anti-collision / safety interlocks functional (if equipped)",
-      "Limit switches operational (hoist, trolley, gantry, boom)",
-      "Load indicator / rated capacity display working",
-      "Anemometer / wind alarm working (if installed)",
-      "Fire extinguishers present, accessible, in-date",
-      "First aid kit available (if applicable to QC)",
-      "Emergency escape route clear",
-      "Safety signage present and readable",
-      "Boom condition (no visible structural damage / cracks)",
-      "Boom pins / latches / locking mechanism OK",
-      "Gantry structure (no deformation / missing fasteners)",
-      "Handrails, toe-boards, guardrails secure",
-      "Stairs condition (treads, anti-slip, handrails)",
-      "Walkways grating intact / no loose panels",
-      "Catwalks and platforms free from corrosion hotspots",
-      "Welds visually sound (no obvious cracks)",
-      "Access gates / safety chains in place",
-      "Fall protection anchor points intact (where provided)",
-      "Hoist wire ropes condition (no broken wires / kinks / birdcage)",
-      "Rope lubrication adequate",
-      "Rope reeving correct / no cross-over on drum",
-      "Sheaves condition (no abnormal wear / cracks)",
-      "Sheave guards in place",
-      "Drum grooves OK / no sharp edges",
-      "Rope end connections secure",
-      "Rope end connections secure",
-      "Spreader condition (no damage / deformation)",
-      "Twistlocks operate smoothly (lock/unlock)",
-      "Twistlock indicators functional (locked/unlocked)",
-      "Flippers / guide arms functional (if equipped)",
-      "Skew / trim / list systems functional (if equipped)",
-      "Headblock / equalizer condition OK",
-      "Spreader lights working (if installed)",
-      "Spreader hydraulic hoses (no leaks / abrasion)",
-      "Hydraulic cylinders (no leaks / damage)",
-      "Hydraulic oil level within range (if check point available)",
-      "Hoist brake performance normal (no abnormal slip / noise)",
-      "Trolley brakes OK",
-      "Gantry brakes OK",
-      "Motors normal (no overheating smell / unusual vibration)",
-      "Gearboxes oil leaks absent",
-      "Gearbox oil levels OK (if sight glass available)",
-      "Couplings/guards in place",
-      "Abnormal noise during test run (none)",
-      "Trolley travel smooth (no jerking / abnormal sound)",
-      "Trolley rail condition (no obstruction / damage)",
-      "Bumpers / end stops OK",
-      "Cable festoon / drag chain condition OK",
-      "Festoon rollers OK / no snagging",
-      "Trolley wheels condition OK",
-      "Trolley alignment normal",
-      "Gantry travel smooth (no abnormal noise/vibration)",
-      "Rail clamps / storm locks functional",
-      "Wheel condition (no flat spots / abnormal wear)",
-      "Rail condition (no obstacles / damage)",
-      "Gantry end stops / buffers OK",
-      "Gantry travel alarms operational",
-      "Skew control system OK (if equipped)",
-      "Control panel doors closed/secured",
-      "No exposed wires / damaged insulation",
-      "Cable routing secured / no hanging cables",
-      "Earthing / bonding visible points intact (visual check)",
-      "Cabin controls responsive / no sticky switches",
-      "Joysticks smooth and functional",
-      "Indicators / gauges functioning",
-      "Overload protection system OK (as per procedure)",
-      "PLC / fault alarms checked (no critical active faults)",
-      "Air-conditioning / ventilation functional",
-      "Cabin glass clean / visibility OK",
-      "Wipers / washers functional (if applicable)",
-      "Seat condition / seatbelt functional",
-      "Cabin door locks / emergency exit accessible",
-      "Mirror condition OK (if applicable)",
-      "Cabin housekeeping OK (no loose items)",
-      "Emergency ladder / rescue equipment available (if applicable)",
-      "Fire detection / alarm system OK (if installed)",
-      "Emergency lighting OK (if installed)",
-      "Lifebuoy / rescue items present (if applicable at waterside)",
-      "Communication with control room tested (if required)",
-      "Stop-work / escalation process understood by operator",
-      "No oil leaks on platforms / ground",
-      "No hydraulic leaks observed",
-      "Drip trays in place (where provided)",
-      "Waste bins present / used properly",
-      "Spill kit accessible (if designated for QC area)",
-      "No-load hoist up/down test OK",
-      "Trolley full travel test OK",
-      "Gantry short travel test OK (if permitted)",
-      "Spreader lock/unlock test OK",
-      "All alarms function during movement (as applicable)"
-    ];
+  // Generate PDF
+  const element = document.getElementById('pdfContent');
+  const opt = {
+    margin:       [10,10,10,10],
+    filename:     'QC-Inspection.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2 },
+    jsPDF:        { unit: 'pt', format: 'a4', orientation: 'portrait' }
+  };
 
-    function escapeHtml(s){
-      return String(s)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
+  html2pdf().from(element).set(opt).outputPdf('datauristring')
+    .then(function(pdfAsString) {
+      sendEmail(pdfAsString);
+    });
+}
 
-    function createChecklistRow(sn, text){
-      const idBase = "row" + sn;
-      return `
-        <tr>
-          <td class="center">${sn}</td>
-          <td>${escapeHtml(text)}</td>
-          <td class="center">
-            <label class="opt"><input type="radio" name="${idBase}_status" value="Yes"><span>Yes</span></label>
-            <label class="opt"><input type="radio" name="${idBase}_status" value="No"><span>No</span></label>
-            <label class="opt"><input type="radio" name="${idBase}_status" value="N/A"><span>N/A</span></label>
-          </td>
-          <td><textarea class="chk-remarks" name="${idBase}_remarks" placeholder="Remarks / defect details..."></textarea></td>
-          <td>
-            <div class="photo-cell">
-              <input type="file" accept="image/*" data-photo onchange="previewPhoto(event,'${idBase}_img')">
-              <div class="thumb" id="${idBase}_img">No image</div>
-            </div>
-          </td>
-        </tr>
-      `;
-    }
+function sendEmail(pdfString) {
+  document.getElementById('status').textContent = "Sending email...";
 
-    // Render checklist
-    document.getElementById("checklistBody").innerHTML =
-      items.map((t,i)=>createChecklistRow(i+1,t)).join("");
-
-    // ===== Observations (add/remove) =====
-    let obsCount = 0;
-
-    function createObsRow(sn){
-      const idBase = "obs" + sn;
-      return `
-        <tr>
-          <td class="center">${sn}</td>
-          <td><textarea class="obs-ta" name="${idBase}_obs" placeholder="Describe issue..."></textarea></td>
-          <td><textarea class="rec-ta" name="${idBase}_rec" placeholder="Action required..."></textarea></td>
-          <td><input type="date" name="${idBase}_date"></td>
-          <td><input type="text" name="${idBase}_resp" placeholder="Name/Dept"></td>
-          <td>
-            <div class="photo-cell">
-              <input type="file" accept="image/*" data-photo onchange="previewPhoto(event,'${idBase}_img')">
-              <div class="thumb" id="${idBase}_img">No image</div>
-            </div>
-          </td>
-        </tr>
-      `;
-    }
-
-    function addObsRow(){
-      obsCount += 1;
-      document.getElementById("obsBody")
-        .insertAdjacentHTML("beforeend", createObsRow(obsCount));
-    }
-
-    function removeObsRow(){
-      if(obsCount <= 1) return;
-      const obsBody = document.getElementById("obsBody");
-      obsBody.removeChild(obsBody.lastElementChild);
-      obsCount -= 1;
-    }
-
-    // start with 6 rows
-    for(let i=0;i<6;i++) addObsRow();
-
-    // ===== Photo preview (base64 so PDF includes it) =====
-    function previewPhoto(event, targetId){
-      const file = event.target.files && event.target.files[0];
-      const box = document.getElementById(targetId);
-      if(!file){ box.textContent = "No image"; return; }
-
-      const img = document.createElement("img");
-      img.alt = "Photo";
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        box.innerHTML = "";
-        img.src = e.target.result;   // base64 data URL
-        box.appendChild(img);
-      };
-      reader.readAsDataURL(file);
-    }
-
-    // ===== Signature pad =====
-    function initSig(canvasId){
-      const canvas = document.getElementById(canvasId);
-      const ctx = canvas.getContext("2d");
-
-      function resize(){
-        const rect = canvas.getBoundingClientRect();
-        const ratio = window.devicePixelRatio || 1;
-        canvas.width = Math.floor(rect.width * ratio);
-        canvas.height = Math.floor(rect.height * ratio);
-        ctx.setTransform(ratio,0,0,ratio,0,0);
-        ctx.lineWidth = 2;
-        ctx.lineCap = "round";
-        ctx.strokeStyle = "#111";
+  Email.send({
+    SecureToken: "YOUR_SMTPJS_SECURE_TOKEN_HERE",
+    To: 'saleh.shaikh@cspadt.ae',
+    From: "no-reply@yourdomain.com",
+    Subject: "New QC Inspection Submission",
+    Body: "Attached is the QC inspection checklist filled by the user.",
+    Attachments: [
+      {
+        name: "QC-Inspection.pdf",
+        data: pdfString
       }
-      resize();
-      window.addEventListener("resize", resize);
-
-      let drawing = false;
-      function pos(e){
-        const rect = canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        return { x: clientX - rect.left, y: clientY - rect.top };
-      }
-      function start(e){
-        drawing = true;
-        const p = pos(e);
-        ctx.beginPath();
-        ctx.moveTo(p.x, p.y);
-        e.preventDefault();
-      }
-      function move(e){
-        if(!drawing) return;
-        const p = pos(e);
-        ctx.lineTo(p.x, p.y);
-        ctx.stroke();
-        e.preventDefault();
-      }
-      function end(e){ drawing = false; e.preventDefault(); }
-
-      canvas.addEventListener("mousedown", start);
-      canvas.addEventListener("mousemove", move);
-      window.addEventListener("mouseup", end);
-
-      canvas.addEventListener("touchstart", start, {passive:false});
-      canvas.addEventListener("touchmove", move, {passive:false});
-      window.addEventListener("touchend", end, {passive:false});
+    ]
+  }).then(
+    message => {
+      document.getElementById('status').textContent = "Submitted! Email sent.";
     }
+  );
+}
+</script>
 
-    function clearSig(canvasId){
-      const canvas = document.getElementById(canvasId);
-      const ctx = canvas.getContext("2d");
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-    }
-
-    function safeCanvasDataUrl(canvas){
-      try{
-        const ctx = canvas.getContext("2d");
-        const pixels = ctx.getImageData(0,0,canvas.width,canvas.height).data;
-        let hasInk = false;
-        for (let i=3; i<pixels.length; i+=4){
-          if (pixels[i] !== 0){ hasInk = true; break; }
-        }
-        if(!hasInk) return "";
-        return canvas.toDataURL("image/png");
-      }catch(e){
-        return "";
-      }
-    }
-
-    initSig("sigInspector");
-    initSig("sigOperator");
-
-    // ===== Build HTML snapshot for PDF =====
-    function buildHtmlForPdf(){
-      // clone the page only (not full document) => avoids broken indexes
-      const pageClone = document.querySelector(".page").cloneNode(true);
-
-      // remove buttons + file inputs
-      pageClone.querySelectorAll("button").forEach(b => b.remove());
-      pageClone.querySelectorAll('input[type="file"]').forEach(f => f.remove());
-
-      // convert signature canvas to images
-      const insp = safeCanvasDataUrl(document.getElementById("sigInspector"));
-      const oper = safeCanvasDataUrl(document.getElementById("sigOperator"));
-
-      const cInsp = pageClone.querySelector("#sigInspector");
-      const cOper = pageClone.querySelector("#sigOperator");
-
-      if (cInsp){
-        const img = document.createElement("img");
-        img.src = insp || "";
-        img.style.width="100%"; img.style.height="130px";
-        img.style.border="1px solid #111"; img.style.borderRadius="6px";
-        cInsp.replaceWith(img);
-      }
-      if (cOper){
-        const img = document.createElement("img");
-        img.src = oper || "";
-        img.style.width="100%"; img.style.height="130px";
-        img.style.border="1px solid #111"; img.style.borderRadius="6px";
-        cOper.replaceWith(img);
-      }
-
-      // copy values: match elements by name/id rather than index (more stable)
-      const liveEls = document.querySelectorAll(".page input, .page textarea, .page select");
-      liveEls.forEach(live => {
-        const name = live.getAttribute("name");
-        const id = live.getAttribute("id");
-        const selector = name ? `[name="${CSS.escape(name)}"]` : (id ? `#${CSS.escape(id)}` : null);
-        if(!selector) return;
-
-        const cloned = pageClone.querySelector(selector);
-        if(!cloned) return;
-
-        if (live.type === "radio" || live.type === "checkbox") {
-          cloned.checked = live.checked;
-          if (live.checked) cloned.setAttribute("checked","checked");
-        } else if (live.tagName === "TEXTAREA") {
-          cloned.textContent = live.value;
-        } else {
-          cloned.value = live.value;
-          cloned.setAttribute("value", live.value);
-        }
-        cloned.setAttribute("disabled","disabled");
-      });
-
-      // fix selected option
-      pageClone.querySelectorAll("select").forEach(sel => {
-        const val = sel.value;
-        Array.from(sel.options).forEach(o => {
-          if (o.value === val) o.setAttribute("selected","selected");
-          else o.removeAttribute("selected");
-        });
-      });
-
-      // build full html with styles copied from current page
-      const styles = Array.from(document.querySelectorAll("style")).map(s => s.outerHTML).join("\n");
-      return `<!doctype html><html><head><meta charset="utf-8">${styles}</head><body>${pageClone.outerHTML}</body></html>`;
-    }
-
-    // ===== Send PDF via Apps Script (returns JSON) =====
-    async function sendEmailPdf(){
-      if (!SCRIPT_URL || SCRIPT_URL.includes("PASTE_YOUR_WEB_APP_URL_HERE")){
-        alert("Paste your Apps Script Web App URL into SCRIPT_URL first.");
-        return;
-      }
-
-      const qcNo = document.querySelector('[name="qcNo"]')?.value?.trim() || "QC";
-      const date = document.querySelector('[name="date"]')?.value || new Date().toISOString().slice(0,10);
-
-      const payload = {
-        qcNo,
-        date,
-        subject: `QC Inspection Checklist - ${qcNo} - ${date}`,
-        filename: `QC_Inspection_${qcNo}_${date}.pdf`,
-        html: buildHtmlForPdf()
-      };
-
-      try{
-        const res = await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type":"text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
-        });
-
-        const text = await res.text();
-        let out = {};
-        try { out = JSON.parse(text); } catch(e){}
-
-        if (out.ok){
-          alert("PDF email sent successfully.");
-        } else {
-          alert("Send failed: " + (out.error || text));
-        }
-      }catch(err){
-        alert("ERROR: " + err.message);
-      }
-    }
-
-    function resetForm(){
-      if(!confirm("Reset everything?")) return;
-
-      document.querySelectorAll("input[type='text'], input[type='date'], input[type='time']").forEach(i=>i.value="");
-      document.querySelectorAll("select").forEach(s=>s.value="");
-      document.querySelectorAll("textarea").forEach(t=>t.value="");
-      document.querySelectorAll("input[type='radio']").forEach(r=>r.checked=false);
-      document.querySelectorAll("input[type='file']").forEach(f=>f.value="");
-      document.querySelectorAll(".thumb").forEach(t=>t.textContent="No image");
-
-      document.getElementById("obsBody").innerHTML = "";
-      obsCount = 0;
-      for(let i=0;i<6;i++) addObsRow();
-
-      clearSig("sigInspector");
-      clearSig("sigOperator");
-    }
-
-    // Buttons
-    document.getElementById("btnAddObs").addEventListener("click", addObsRow);
-    document.getElementById("btnRemObs").addEventListener("click", removeObsRow);
-    document.getElementById("btnClearInsp").addEventListener("click", () => clearSig("sigInspector"));
-    document.getElementById("btnClearOper").addEventListener("click", () => clearSig("sigOperator"));
-    document.getElementById("btnReset").addEventListener("click", resetForm);
-    document.getElementById("btnSendPdf").addEventListener("click", sendEmailPdf);
-  </script>
 </body>
 </html>
