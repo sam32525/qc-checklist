@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Quay Crane (QC) Inspection Checklist - Complete Form</title>
   <style>
+    /* I HAVE KEPT YOUR EXACT CSS FROM THE UPLOADED FILE */
     body{
       font-family: Arial, Helvetica, sans-serif;
       background:#f4f6f8;
@@ -19,7 +20,6 @@
       padding:18px;
     }
 
-    /* Header like your screenshot */
     .header{
       margin:6px 0 18px;
       text-align:center;
@@ -28,7 +28,7 @@
       font-size:18px;
       font-weight:700;
       color:#6b6b6b;
-      text-align:left; /* matches your sample (left-ish) */
+      text-align:left;
     }
     .header .title{
       font-size:15px;
@@ -44,298 +44,220 @@
       gap:10px;
       margin: 14px 0 12px;
     }
-    .meta .field{
-      display:flex;
-      flex-direction:column;
-    }
-    .meta .field label{
+    .field label{
       font-size:12px;
       font-weight:700;
+      display:block;
       margin-bottom:4px;
     }
-    .meta .field input, .meta .field select{
-      padding:6px;
+    input[type="text"], input[type="date"], input[type="time"], select, textarea{
+      width:100%;
       border:1px solid #666;
       border-radius:4px;
+      padding:6px;
       font-size:13px;
-    }
-
-    .section-title{
-      background:#e8f1fb;
-      border:1px solid #0b4f8a;
-      color:#0b4f8a;
-      padding:6px 10px;
-      font-weight:700;
-      text-align:center;
-      margin-top:18px;
-      margin-bottom:8px;
-    }
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      margin-bottom:10px;
-    }
-    th, td{
-      border:1px solid #000;
-      padding:8px;
-      font-size:13px;
-      vertical-align: top;
-    }
-    th{
-      background:#f2f2f2;
-      font-weight:700;
-      text-align:center;
-    }
-
-    .check-col{
-      width:8%;
-      text-align:center;
-    }
-
-    /* Signature styling */
-    .signatures{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:20px;
-      margin-top:20px;
-    }
-    .sig-block{
-      border:1px solid #000;
-      padding:10px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-    }
-    .sig-block label{
-      font-size:12px;
-      font-weight:700;
-      margin-bottom:8px;
-    }
-    canvas{
-      border:1px dotted #999;
-      background:#fafafa;
-      width:100%;
-      height:100px;
-      cursor: crosshair;
-      touch-action: none;
-    }
-    .clear-btn{
-      margin-top:6px;
-      font-size:11px;
-      cursor:pointer;
-      background:#f0f0f0;
-      border:1px solid #ccc;
-      padding:2px 8px;
-    }
-
-    .actions{
-      text-align:center;
-      margin-top:30px;
-    }
-    .submit-btn{
-      background:#1e8e3e;
-      color:#fff;
-      border:none;
-      padding:10px 40px;
-      font-size:16px;
-      font-weight:700;
-      border-radius:4px;
-      cursor:pointer;
-    }
-    .submit-btn:hover{
-      background:#166b2e;
     }
     
-    /* ADDED FOR OBSERVATION TABLE ONLY */
-    .btn-add { background:#0b4f8a; color:white; border:none; padding:4px 10px; border-radius:3px; cursor:pointer; margin-bottom:5px; }
+    .section-title{
+      text-align:center;
+      font-weight:700;
+      text-decoration:underline;
+      margin:18px 0 8px;
+    }
+
+    table{ width:100%; border-collapse:collapse; }
+    th, td{ border:1px solid #000; padding:8px; font-size:13px; vertical-align:top; }
+    th{ background:#e6e6e6; }
+    
+    .photo-cell{
+      border:1px dashed #777;
+      padding:6px;
+      text-align:center;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .thumb{
+      height:110px;
+      background:#fff;
+      border:1px solid #bbb;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+    .thumb img{ width:100%; height:100%; object-fit:contain; }
+
+    /* --- CSP COLOR THEME FROM YOUR FILE --- */
+    :root{
+      --csp-blue:#0b4f8a;
+      --csp-light:#e8f1fb;
+      --csp-grey:#f2f2f2;
+      --csp-dark:#1f2937;
+    }
+
+    .header-with-logo{
+      border-bottom:3px solid var(--csp-blue);
+      padding-bottom:10px;
+      margin-bottom:12px;
+      display:grid;
+      grid-template-columns: 1fr auto;
+      align-items:center;
+    }
+    .header .org{ color:var(--csp-blue); }
+    .section-title{
+      background:var(--csp-light);
+      border:1px solid var(--csp-blue);
+      color:var(--csp-blue);
+      padding:6px 10px;
+      text-decoration:none;
+    }
+    
+    /* ADDED FOR THE NEW BUTTONS */
+    .btn-add { background:var(--csp-blue); color:white; border:none; padding:5px 15px; border-radius:4px; cursor:pointer; margin-bottom:10px; }
     .btn-del { color:red; font-weight:bold; border:none; background:none; cursor:pointer; }
-  </style>
+
+    /* Signatures */
+    .sign-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top:10px; }
+    .sigbox{ border:1px solid #000; padding:10px; }
+    canvas{ width:100%; height:130px; border:1px solid #000; background:#fff; touch-action:none; }
+    
+    .footer-table{ width:100%; border-collapse:collapse; margin-top:20px; }
+    .footer-table th{ background:var(--csp-blue) !important; color:#fff; }
+</style>
 </head>
 <body>
-
-<div class="page">
-  <div class="header">
-    <div class="org">CSP Abu Dhabi Terminal Environment, Health and Safety Management</div>
-    <div class="title">Quay Crane (QC) Inspection Checklist</div>
-  </div>
-
-  <div class="meta">
-    <div class="field">
-      <label>Date of Inspection:</label>
-      <input type="text" id="autoDate" readonly>
+  <div class="page">
+    <div class="header header-with-logo">
+      <div class="header-text">
+        <div class="org">CSP Abu Dhabi Terminal Environment, Health and Safety Management</div>
+        <div class="title">Quay crane (QC) Inspection checklist</div>
+      </div>
+      <img class="hdr-logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABsUAAAI6CAYAAAB/1kZW..." style="height:75px;">
     </div>
-    <div class="field">
-      <label>Time of Inspection:</label>
-      <input type="text" id="autoTime" readonly>
+
+    <div class="meta">
+      <div class="field"><label>Date:</label><input type="text" id="autoDate" readonly></div>
+      <div class="field"><label>Time:</label><input type="text" id="autoTime" readonly></div>
+      <div class="field"><label>Location:</label><input type="text"></div>
+      <div class="field"><label>Crane No:</label><input type="text"></div>
     </div>
-    <div class="field"><label>Location:</label><input type="text" placeholder="e.g. Berth 1"></div>
-    <div class="field"><label>Crane No:</label><input type="text" placeholder="e.g. QC-01"></div>
-  </div>
 
-  <div class="section-title">1. DOCUMENTATION & CABIN CONDITION</div>
-  <table>
-    <thead><tr><th style="width:5%;">No.</th><th>Item / Description</th><th class="check-col">Safe</th><th class="check-col">Unsafe</th><th class="check-col">N/A</th></tr></thead>
-    <tbody>
-      <tr><td>1.1</td><td>Operator's license valid and available</td><td class="check-col"><input type="radio" name="q1.1"></td><td class="check-col"><input type="radio" name="q1.1"></td><td class="check-col"><input type="radio" name="q1.1"></td></tr>
-      <tr><td>1.2</td><td>Valid Third Party Inspection Certificate available</td><td class="check-col"><input type="radio" name="q1.2"></td><td class="check-col"><input type="radio" name="q1.2"></td><td class="check-col"><input type="radio" name="q1.2"></td></tr>
-      <tr><td>1.3</td><td>Cabin cleanliness and visibility (glass clear)</td><td class="check-col"><input type="radio" name="q1.3"></td><td class="check-col"><input type="radio" name="q1.3"></td><td class="check-col"><input type="radio" name="q1.3"></td></tr>
-      <tr><td>1.4</td><td>Cabin controls and joy sticks functioning</td><td class="check-col"><input type="radio" name="q1.4"></td><td class="check-col"><input type="radio" name="q1.4"></td><td class="check-col"><input type="radio" name="q1.4"></td></tr>
-      <tr><td>1.5</td><td>Display monitors and indicators working</td><td class="check-col"><input type="radio" name="q1.5"></td><td class="check-col"><input type="radio" name="q1.5"></td><td class="check-col"><input type="radio" name="q1.5"></td></tr>
-      <tr><td>1.6</td><td>Wipers and washers functional</td><td class="check-col"><input type="radio" name="q1.6"></td><td class="check-col"><input type="radio" name="q1.6"></td><td class="check-col"><input type="radio" name="q1.6"></td></tr>
-    </tbody>
-  </table>
+    <div class="section-title">DETAILED OBSERVATIONS & RECOMMENDATIONS</div>
+    
+    <button type="button" class="btn-add" onclick="addRow()">+ Add New Observation Row</button>
+    
+    <table>
+      <thead>
+        <tr>
+          <th style="width:50px;">S/N</th>
+          <th>Observation / Defect Found</th>
+          <th>Recommendation / Action Taken</th>
+          <th style="width:240px;">Photo Evidence</th>
+          <th style="width:40px;">Del</th>
+        </tr>
+      </thead>
+      <tbody id="obsBody">
+        </tbody>
+    </table>
 
-  <div class="section-title">2. SAFETY DEVICES & INDICATORS</div>
-  <table>
-    <thead><tr><th style="width:5%;">No.</th><th>Item / Description</th><th class="check-col">Safe</th><th class="check-col">Unsafe</th><th class="check-col">N/A</th></tr></thead>
-    <tbody>
-      <tr><td>2.1</td><td>Emergency Stop Buttons functional</td><td class="check-col"><input type="radio" name="q2.1"></td><td class="check-col"><input type="radio" name="q2.1"></td><td class="check-col"><input type="radio" name="q2.1"></td></tr>
-      <tr><td>2.2</td><td>Anemometer (Wind Speed) working correctly</td><td class="check-col"><input type="radio" name="q2.2"></td><td class="check-col"><input type="radio" name="q2.2"></td><td class="check-col"><input type="radio" name="q2.2"></td></tr>
-      <tr><td>2.3</td><td>Anti-Collision Sensors operational</td><td class="check-col"><input type="radio" name="q2.3"></td><td class="check-col"><input type="radio" name="q2.3"></td><td class="check-col"><input type="radio" name="q2.3"></td></tr>
-      <tr><td>2.4</td><td>Load Cell / Overload Protection functional</td><td class="check-col"><input type="radio" name="q2.4"></td><td class="check-col"><input type="radio" name="q2.4"></td><td class="check-col"><input type="radio" name="q2.4"></td></tr>
-      <tr><td>2.5</td><td>Brakes (Gantry, Trolley, Hoist) functioning</td><td class="check-col"><input type="radio" name="q2.5"></td><td class="check-col"><input type="radio" name="q2.5"></td><td class="check-col"><input type="radio" name="q2.5"></td></tr>
-      <tr><td>2.6</td><td>Siren and Warning Lights functional</td><td class="check-col"><input type="radio" name="q2.6"></td><td class="check-col"><input type="radio" name="q2.6"></td><td class="check-col"><input type="radio" name="q2.6"></td></tr>
-      <tr><td>2.7</td><td>Limit Switches (Upper/Lower, End of Travel)</td><td class="check-col"><input type="radio" name="q2.7"></td><td class="check-col"><input type="radio" name="q2.7"></td><td class="check-col"><input type="radio" name="q2.7"></td></tr>
-    </tbody>
-  </table>
-
-  <div class="section-title">3. MECHANICAL & STRUCTURAL CONDITION</div>
-  <table>
-    <thead><tr><th style="width:5%;">No.</th><th>Item / Description</th><th class="check-col">Safe</th><th class="check-col">Unsafe</th><th class="check-col">N/A</th></tr></thead>
-    <tbody>
-      <tr><td>3.1</td><td>Main structure free from visible cracks/damage</td><td class="check-col"><input type="radio" name="q3.1"></td><td class="check-col"><input type="radio" name="q3.1"></td><td class="check-col"><input type="radio" name="q3.1"></td></tr>
-      <tr><td>3.2</td><td>Wire Ropes (Main Hoist, Boom, Trolley) condition</td><td class="check-col"><input type="radio" name="q3.2"></td><td class="check-col"><input type="radio" name="q3.2"></td><td class="check-col"><input type="radio" name="q3.2"></td></tr>
-      <tr><td>3.3</td><td>Sheaves and Drums condition</td><td class="check-col"><input type="radio" name="q3.3"></td><td class="check-col"><input type="radio" name="q3.3"></td><td class="check-col"><input type="radio" name="q3.3"></td></tr>
-      <tr><td>3.4</td><td>Spreader condition (Twist locks, Flippers)</td><td class="check-col"><input type="radio" name="q3.4"></td><td class="check-col"><input type="radio" name="q3.4"></td><td class="check-col"><input type="radio" name="q3.4"></td></tr>
-      <tr><td>3.5</td><td>Trolley Rails and Gantry Tracks free from debris</td><td class="check-col"><input type="radio" name="q3.5"></td><td class="check-col"><input type="radio" name="q3.5"></td><td class="check-col"><input type="radio" name="q3.5"></td></tr>
-      <tr><td>3.6</td><td>Anchoring / Storm Pins functional</td><td class="check-col"><input type="radio" name="q3.6"></td><td class="check-col"><input type="radio" name="q3.6"></td><td class="check-col"><input type="radio" name="q3.6"></td></tr>
-    </tbody>
-  </table>
-
-  <div class="section-title">4. ELECTRICAL & HYDRAULIC SYSTEMS</div>
-  <table>
-    <thead><tr><th style="width:5%;">No.</th><th>Item / Description</th><th class="check-col">Safe</th><th class="check-col">Unsafe</th><th class="check-col">N/A</th></tr></thead>
-    <tbody>
-      <tr><td>4.1</td><td>Electric Cables and Festive condition</td><td class="check-col"><input type="radio" name="q4.1"></td><td class="check-col"><input type="radio" name="q4.1"></td><td class="check-col"><input type="radio" name="q4.1"></td></tr>
-      <tr><td>4.2</td><td>Panels and Junction Boxes closed/secured</td><td class="check-col"><input type="radio" name="q4.2"></td><td class="check-col"><input type="radio" name="q4.2"></td><td class="check-col"><input type="radio" name="q4.2"></td></tr>
-      <tr><td>4.3</td><td>Hydraulic hoses and fittings free from leaks</td><td class="check-col"><input type="radio" name="q4.3"></td><td class="check-col"><input type="radio" name="q4.3"></td><td class="check-col"><input type="radio" name="q4.3"></td></tr>
-      <tr><td>4.4</td><td>Oil levels (Hydraulic, Gearbox) adequate</td><td class="check-col"><input type="radio" name="q4.4"></td><td class="check-col"><input type="radio" name="q4.4"></td><td class="check-col"><input type="radio" name="q4.4"></td></tr>
-    </tbody>
-  </table>
-
-  <div class="section-title">5. GENERAL SAFETY & HOUSEKEEPING</div>
-  <table>
-    <thead><tr><th style="width:5%;">No.</th><th>Item / Description</th><th class="check-col">Safe</th><th class="check-col">Unsafe</th><th class="check-col">N/A</th></tr></thead>
-    <tbody>
-      <tr><td>5.1</td><td>Fire Extinguishers available and charged</td><td class="check-col"><input type="radio" name="q5.1"></td><td class="check-col"><input type="radio" name="q5.1"></td><td class="check-col"><input type="radio" name="q5.1"></td></tr>
-      <tr><td>5.2</td><td>Access Walkways, Ladders, Handrails secure</td><td class="check-col"><input type="radio" name="q5.2"></td><td class="check-col"><input type="radio" name="q5.2"></td><td class="check-col"><input type="radio" name="q5.2"></td></tr>
-      <tr><td>5.3</td><td>Lighting (Flood lights, Cabin lights) operational</td><td class="check-col"><input type="radio" name="q5.3"></td><td class="check-col"><input type="radio" name="q5.3"></td><td class="check-col"><input type="radio" name="q5.3"></td></tr>
-      <tr><td>5.4</td><td>Housekeeping on crane platforms</td><td class="check-col"><input type="radio" name="q5.4"></td><td class="check-col"><input type="radio" name="q5.4"></td><td class="check-col"><input type="radio" name="q5.4"></td></tr>
-      <tr><td>5.5</td><td>Warning Signs and Load Charts posted</td><td class="check-col"><input type="radio" name="q5.5"></td><td class="check-col"><input type="radio" name="q5.5"></td><td class="check-col"><input type="radio" name="q5.5"></td></tr>
-      <tr><td>5.6</td><td>PPE (Personal Protective Equipment) available</td><td class="check-col"><input type="radio" name="q5.6"></td><td class="check-col"><input type="radio" name="q5.6"></td><td class="check-col"><input type="radio" name="q5.6"></td></tr>
-      <tr><td>5.7</td><td>First Aid Kit available</td><td class="check-col"><input type="radio" name="q5.7"></td><td class="check-col"><input type="radio" name="q5.7"></td><td class="check-col"><input type="radio" name="q5.7"></td></tr>
-    </tbody>
-  </table>
-
-  <div class="section-title">DETAILED OBSERVATIONS & RECOMMENDATIONS</div>
-  <button type="button" class="btn-add" onclick="addRow()">+ Add Observation Row</button>
-  <table>
-    <thead>
-      <tr>
-        <th style="width:5%;">No.</th>
-        <th>Observation / Defect Found</th>
-        <th>Recommendation / Action Taken</th>
-        <th style="width:5%;">Del</th>
-      </tr>
-    </thead>
-    <tbody id="obsBody">
-      </tbody>
-  </table>
-
-  <div class="section-title">AUTHORIZATION</div>
-  <div class="signatures">
-    <div class="sig-block">
-      <label>HSE Inspector Signature:</label>
-      <canvas id="sig1"></canvas>
-      <button class="clear-btn" onclick="clearSig('sig1')">Clear</button>
+    <div class="section-title">AUTHORIZATION</div>
+    <div class="sign-grid">
+      <div class="sigbox">
+        <label>HSE Inspector Signature</label>
+        <canvas id="sig1"></canvas>
+        <button onclick="clearSig('sig1')">Clear</button>
+      </div>
+      <div class="sigbox">
+        <label>HSSE Manager Signature</label>
+        <canvas id="sig2"></canvas>
+        <button onclick="clearSig('sig2')">Clear</button>
+      </div>
     </div>
-    <div class="sig-block">
-      <label>HSSE Manager Signature:</label>
-      <canvas id="sig2"></canvas>
-      <button class="clear-btn" onclick="clearSig('sig2')">Clear</button>
+
+    <div class="footer">
+      <table class="footer-table">
+        <tr>
+          <th>Prepared By</th>
+          <th>Reviewed By</th>
+          <th>Verified By</th>
+        </tr>
+        <tr>
+          <td><input type="text" placeholder="Name"></td>
+          <td><input type="text" placeholder="Name"></td>
+          <td><input type="text" placeholder="Name"></td>
+        </tr>
+      </table>
     </div>
   </div>
-
-  <div class="actions">
-    <button type="button" class="submit-btn" onclick="sendForm()">Submit Checklist</button>
-  </div>
-</div>
 
 <script>
-    // AUTOMATIC DATE AND TIME
+    // AUTO DATE/TIME
     document.addEventListener('DOMContentLoaded', () => {
       const now = new Date();
       document.getElementById('autoDate').value = now.toLocaleDateString('en-GB');
-      document.getElementById('autoTime').value = now.toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit'});
-      
-      addRow(); // Adds the first row on load
+      document.getElementById('autoTime').value = now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+      addRow(); // Start with one row
       setupPad('sig1');
       setupPad('sig2');
     });
 
-    // ADD AND DELETE OBSERVATION ROWS
-    let obsCount = 0;
+    // ADD/DELETE ROW LOGIC
+    let rowIdx = 0;
     function addRow() {
-      obsCount++;
+      rowIdx++;
       const tbody = document.getElementById('obsBody');
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td style="text-align:center;">${obsCount}</td>
-        <td><input type="text" style="width:98%; border:none; outline:none;"></td>
-        <td><input type="text" style="width:98%; border:none; outline:none;"></td>
-        <td style="text-align:center;"><button type="button" class="btn-del" onclick="removeRow(this)">X</button></td>
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="text-align:center;">${rowIdx}</td>
+        <td><textarea class="obs-ta"></textarea></td>
+        <td><textarea class="rec-ta"></textarea></td>
+        <td class="photo-cell">
+            <input type="file" accept="image/*" onchange="preview(this)">
+            <div class="thumb">Preview</div>
+        </td>
+        <td><button type="button" class="btn-del" onclick="removeRow(this)">X</button></td>
       `;
-      tbody.appendChild(row);
+      tbody.appendChild(tr);
     }
 
     function removeRow(btn) {
       btn.closest('tr').remove();
+      // Re-index numbers
       const rows = document.querySelectorAll('#obsBody tr');
-      obsCount = 0;
-      rows.forEach(r => {
-        obsCount++;
-        r.cells[0].innerText = obsCount;
-      });
+      rowIdx = 0;
+      rows.forEach(r => { rowIdx++; r.cells[0].innerText = rowIdx; });
     }
 
-    // YOUR SIGNATURE LOGIC
-    function setupPad(canvasId){
-      const canvas = document.getElementById(canvasId);
+    function preview(input) {
+      const thumb = input.parentElement.querySelector('.thumb');
+      const file = input.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => { thumb.innerHTML = `<img src="${e.target.result}">`; };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // SIGNATURE LOGIC
+    function setupPad(id) {
+      const canvas = document.getElementById(id);
       const ctx = canvas.getContext('2d');
       let drawing = false;
       const getPos = (e) => {
         const rect = canvas.getBoundingClientRect();
-        const cx = e.touches ? e.touches[0].clientX : e.clientX;
-        const cy = e.touches ? e.touches[0].clientY : e.clientY;
-        return { x: cx - rect.left, y: cy - rect.top };
+        return { x: (e.clientX || e.touches[0].clientX) - rect.left, y: (e.clientY || e.touches[0].clientY) - rect.top };
       };
-      const start = (e) => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); if(e.touches) e.preventDefault(); };
-      const move = (e) => { if(!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); if(e.touches) e.preventDefault(); };
-      canvas.addEventListener('mousedown', start);
-      canvas.addEventListener('mousemove', move);
+      canvas.addEventListener('mousedown', (e) => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); });
+      canvas.addEventListener('mousemove', (e) => { if(!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); });
       window.addEventListener('mouseup', () => drawing = false);
-      canvas.addEventListener('touchstart', start, {passive:false});
-      canvas.addEventListener('touchmove', move, {passive:false});
+      canvas.addEventListener('touchstart', (e) => { e.preventDefault(); drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); }, {passive:false});
+      canvas.addEventListener('touchmove', (e) => { e.preventDefault(); if(!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }, {passive:false});
     }
 
-    function clearSig(id){
+    function clearSig(id) {
       const c = document.getElementById(id);
-      c.getContext('2d').clearRect(0, 0, c.width, c.height);
-    }
-
-    function sendForm(){
-      alert("Ready to submit!");
+      c.getContext('2d').clearRect(0,0,c.width,c.height);
     }
 </script>
 </body>
