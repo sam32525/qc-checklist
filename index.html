@@ -3,1392 +3,174 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Quay Crane (QC) Inspection Checklist - Complete Form</title>
+  <title>Quay Crane (QC) Inspection Checklist - Professional Version</title>
   <style>
-    body{
-      font-family: Arial, Helvetica, sans-serif;
-      background:#f4f6f8;
-      padding:20px;
-      color:#000;
-    }
-    .page{
-      max-width: 1200px;
-      margin:auto;
-      background:#fff;
-      border:1px solid #000;
-      padding:18px;
-    }
-
-    /* Header like your screenshot */
-    .header{
-      margin:6px 0 18px;
-      text-align:center;
-    }
-    .header .org{
-      font-size:18px;
-      font-weight:700;
-      color:#6b6b6b;
-      text-align:left; /* matches your sample (left-ish) */
-    }
-    .header .title{
-      font-size:15px;
-      font-weight:700;
-      text-decoration:underline;
-      margin-top:10px;
-      text-align:center;
-    }
-
-    .meta{
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap:10px;
-      margin: 14px 0 12px;
-    }
-    .field label{
-      font-size:12px;
-      font-weight:700;
-      display:block;
-      margin-bottom:4px;
-    }
-    input[type="text"], input[type="date"], input[type="time"], select, textarea{
-      width:100%;
-      border:1px solid #666;
-      border-radius:4px;
-      padding:6px;
-      font-size:13px;
-    }
-    textarea{ min-height:58px; resize:vertical; }
-
-    .section-title{
-      text-align:center;
-      font-weight:700;
-      text-decoration:underline;
-      margin:18px 0 8px;
-    }
-
-    table{ width:100%; border-collapse:collapse; }
-    th, td{ border:1px solid #000; padding:8px; font-size:13px; vertical-align:top; }
-td{vertical-align:top;}
-    th{ background:#e6e6e6; }
-    .center{ text-align:center; }
-    .w-sn{ width:55px; }
-    .w-cond{ width:220px; }
-    .w-photo{ width:240px; }
-    .w-status{ width:140px; }
-
-    .opt{ margin-right:10px; white-space:nowrap; display:inline-block; }
-    .photo-cell{
-      border:1px dashed #777;
-      padding:6px;
-      text-align:center;
-    }
-    .thumb{
-      margin-top:6px;
-      height:90px;
-      border:1px solid #bbb;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:12px;
-      color:#666;
-      overflow:hidden;
-      background:#fff;
-    }
-    .thumb img{ width:100%; height:100%; object-fit:cover; }
-
-    /* Better alignment after attaching photos */
-    .photo-cell{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      align-items:stretch;
-    }
-    .photo-cell input[type="file"]{
-      width:100%;
-      font-size:12px;
-    }
-    /* Keep previews consistent so rows don't look broken */
-    .thumb{
-      height:110px;            /* fixed height so table stays neat */
-      background:#fff;
-    }
-    .thumb img{
-      object-fit:contain;      /* show full image without cropping */
-    }
-
-    /* Make textareas in the Observations table match the photo height */
-    .obs-ta, .rec-ta{
-      height:110px;
-      min-height:110px;
-    }
-    /* Checklist remarks can stay smaller */
-    .chk-remarks{
-      min-height:58px;
-      height:58px;
-    }
-
-
-    /* Signatures */
-    .sign-grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:16px;
-      margin-top:10px;
-    }
-    .sigbox{
-      border:1px solid #000;
-      padding:10px;
-    }
-    canvas{
-      width:100%;
-      height:130px;
-      border:1px solid #000;
-      border-radius:6px;
-      background:#fff;
-      touch-action:none;
-    }
-    .sig-actions{
-      display:flex;
-      gap:10px;
-      margin-top:8px;
-      justify-content:flex-end;
-    }
-    button{
-      padding:8px 14px;
-      font-size:14px;
-      border:1px solid #000;
-      background:#000;
-      color:#fff;
-      border-radius:6px;
-      cursor:pointer;
-    }
-    button.secondary{
-      background:#fff;
-      color:#000;
-    }
-    .actions{
-      margin-top:18px;
-      display:flex;
-      justify-content:center;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    @media print {
-      body{ background:#fff; padding:0; }
-      .page{ border:none; }
-      .actions, .sig-actions{ display:none !important; }
-      input, textarea, select{ border:0; }
-      .photo-cell input{ display:none; }
-      .thumb{ height:130px; }
-    }
-  
-    /* --- Fix textarea overlapping table borders --- */
-    td { position: relative; }
-    textarea {
-      box-sizing: border-box;
-      width: 100%;
-      max-width: 100%;
-      resize: vertical;
-      overflow: auto;
-    }
-    /* Keep checklist remarks inside cell */
-    .chk-remarks{
-      height: 70px;
-      min-height: 70px;
-      max-height: 160px;
-    }
-    /* Keep observation & recommendation boxes aligned */
-    .obs-ta, .rec-ta{
-      height: 110px;
-      min-height: 110px;
-      max-height: 220px;
-    }
-
-
-    /* --- Header logo (top-right) --- */
-    .header-with-logo{ position: relative; padding-right: 220px; }
-    .hdr-logo{
-      position:absolute;
-      top:0;
-      right:0;
-      height:85px;
-      width:auto;
-    }
-
-    /* --- Footer (bottom) --- */
-    .footer{ margin-top:14px; }
-    .footer-table{
-      width:100%;
-      border-collapse:collapse;
-      table-layout:fixed;
-      font-size:12px;
-    }
-    .footer-table th, .footer-table td{
-      border:1px solid #000;
-      padding:6px 8px;
-    }
-    .footer-table th{
-      background:#e6e6e6;
-      text-align:center;
-      font-weight:700;
-    }
-    .footer-table td input{
-      border:0;
-      width:100%;
-      font-size:12px;
-      padding:0;
-      background:transparent;
-      text-align:center;
-    }
-
-    /* Keep space for footer so content doesn't cover it */
-    .page{ padding-bottom:140px; }
-
-    @media print{
-      .hdr-logo{ height:75px; }
-      .footer{
-        position:fixed;
-        left:0;
-        right:0;
-        bottom:0;
-        padding:0 18px 10px;
-        background:#fff;
-      }
-      .page{ padding-bottom:0; }
-      body{ margin-bottom:140px; }
-    }
-
-
-    /* --- Header alignment fix --- */
-    .header-with-logo{
-      display:grid;
-      grid-template-columns: 1fr auto;
-      align-items:center;
-      gap:16px;
-      padding-right:0;
-      position:relative;
-    }
-    .header-text{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-    }
-    .hdr-logo{
-      position:static;
-      height:75px;
-      width:auto;
-      justify-self:end;
-    }
-
-
-    /* ===== COLOR THEME ===== */
-    :root{
-      --csp-blue:#0b4f8a;
-      --csp-light:#e8f1fb;
-      --csp-grey:#f2f2f2;
-      --csp-dark:#1f2937;
-    }
-
-    /* Header */
-    .header-with-logo{
-      border-bottom:3px solid var(--csp-blue);
-      padding-bottom:10px;
-      margin-bottom:12px;
-    }
-    .header .org{
-      color:var(--csp-blue);
-      font-weight:700;
-    }
-    .header .title{
-      color:var(--csp-dark);
-    }
-
-    /* Section titles */
-    .section-title{
-      background:var(--csp-light);
-      border:1px solid var(--csp-blue);
-      color:var(--csp-blue);
-      padding:6px 10px;
-      text-decoration:none;
-    }
-
-    /* Table headers */
-    th{
-      background:var(--csp-grey) !important;
-      color:var(--csp-dark);
-    }
-
-    /* Condition radios */
-    .opt input[type="radio"]:checked + span{font-weight:700}
-
-    /* Buttons */
-    button{
-      background:var(--csp-blue);
-      border-color:var(--csp-blue);
-    }
-    button.secondary{
-      background:#fff;
-      color:var(--csp-blue);
-      border-color:var(--csp-blue);
-    }
-
-    /* Footer */
-    .footer-table th{
-      background:var(--csp-blue) !important;
-      color:#fff;
-    }
-
-    /* Highlight NO selections */
-    input[type="radio"][value="No"]:checked { accent-color:#c0392b; }
-
-    input[value="Yes"]:checked{  accent-color:#1e8e3e; }
-  
-    /* --- Footer INSIDE page border (like your sample) --- */
-    .page{
-      position:relative;
-      min-height: calc(100vh - 40px); /* body has padding 20px */
-      padding-bottom:160px; /* reserve space so content won't touch footer */
-    }
-
-    .footer{
-      position:absolute;
-      left:18px;
-      right:18px;
-      bottom:18px;
-      background:#fff;
-      z-index:2;
-    }
-
-    .footer-table{
-      width:70%;
-      margin:0 auto;            /* centered like sample */
-      border-collapse:collapse;
-      table-layout:fixed;
-      font-size:12px;
-    }
-    .footer-table th, .footer-table td{
-      border:1px solid #6b7280; /* softer like sample */
-      padding:6px 8px;
-    }
-    .footer-table th{
-      background:#ffffff !important; /* sample looks white header */
-      color:#6b7280;
-      font-weight:700;
-      text-align:center;
-    }
-    .footer-table td{
-      text-align:center;
-      font-weight:600;
-      color:#4b5563;
-    }
-
-    @media print{
-      /* Ensure footer stays at bottom within print page area */
-      .page{ min-height:auto; }
-      .footer{
-        position:fixed;
-        left:18px;
-        right:18px;
-        bottom:12px;
-      }
-      .footer-table{ width:70%; }
-    }
-
-
-    /* --- Make footer table long/full width --- */
-    .footer-table{
-      width:100% !important;   /* stretch across page */
-      max-width:100%;
-      margin:0;               /* no centering gap */
-    }
-
-</style>
+    /* PRESERVING YOUR ORIGINAL STYLING */
+    body{ font-family: Arial, Helvetica, sans-serif; background:#f4f6f8; padding:20px; color:#000; }
+    .page{ max-width: 1200px; margin:auto; background:#fff; border:1px solid #000; padding:18px; position:relative; }
+    .header-with-logo{ display:grid; grid-template-columns: 1fr auto; align-items:center; gap:16px; border-bottom:3px solid #0b4f8a; padding-bottom:10px; }
+    .header .org{ font-size:18px; font-weight:700; color:#0b4f8a; }
+    .header .title{ font-size:15px; font-weight:700; text-decoration:underline; }
+    .meta{ display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin: 14px 0 12px; }
+    .field label{ font-size:12px; font-weight:700; display:block; margin-bottom:4px; }
+    input[type="text"], select, textarea{ width:100%; border:1px solid #666; border-radius:4px; padding:6px; font-size:13px; box-sizing: border-box; }
+    .section-title{ background:#e8f1fb; border:1px solid #0b4f8a; color:#0b4f8a; padding:6px 10px; font-weight:700; text-align:center; margin:18px 0 8px; }
+    table{ width:100%; border-collapse:collapse; margin-bottom:10px; }
+    th, td{ border:1px solid #000; padding:8px; font-size:13px; }
+    th{ background:#f2f2f2; }
+    .btn-add{ background:#0b4f8a; color:white; padding:8px 15px; border:none; border-radius:4px; cursor:pointer; margin-bottom:15px; }
+    .btn-del{ color:red; font-weight:bold; border:none; background:none; cursor:pointer; }
+    .sigbox{ border:1px solid #000; padding:10px; margin-top:10px; }
+    canvas{ width:100%; height:100px; border:1px solid #000; background:#fff; }
+    .actions{ text-align:center; margin-top:20px; }
+    .submit-btn{ background:#1e8e3e; color:white; padding:10px 30px; font-size:16px; border:none; border-radius:5px; cursor:pointer; }
+    
+    /* Auto-Date Styling */
+    .locked-field { background-color: #eee; cursor: not-allowed; }
+  </style>
 </head>
 <body>
-  <div class="page">
-    <div class="header header-with-logo">
-      <div class="header-text">
-        <div class="org">CSP Abu Dhabi Terminal Environment, Health and Safety Management</div>
-        <div class="title">Quay crane (QC) Inspection checklist</div>
-      </div>
-<img class="hdr-logo" src="logo.png" alt="Logo">
+
+<div class="page">
+  <div class="header header-with-logo">
+    <div class="header-text">
+      <div class="org">CSP Abu Dhabi Terminal Environment, Health and Safety Management</div>
+      <div class="title">Quay Crane (QC) Inspection Checklist</div>
     </div>
-
-    <form id="qcForm" autocomplete="off">
-      <div class="meta">
-        <div class="field">
-<label>QC No</label>
-<select name="qcNo">
-  <option value="">Select QC</option>
-  <option>QC 101</option>
-<option>QC 102</option>
-<option>QC 103</option>
-<option>QC 104</option>
-<option>QC 105</option>
-<option>QC 106</option>
-<option>QC 107</option>
-<option>QC 108</option>
-<option>QC 109</option>
-<option>QC 110</option>
-<option>QC 111</option>
-</select>
-</div>
-        <div class="field"><label>Date Inspected</label><input type="date" name="dateInspected" /></div>
-        <div class="field"><label>Time</label><input type="time" name="timeInspected" /></div>
-        <div class="field"><label>Location</label><input type="text" name="location" /></div>
-        <div class="field"><label>Inspector Name</label><input type="text" name="inspectorName" /></div>
-        <div class="field"><label>Department / Company</label><input type="text" name="company" /></div>
-        <div class="field"><label>Weather</label>
-          <select name="weather">
-            <option value="">Select</option><option>Clear</option><option>Sunny</option><option>Windy</option><option>Dusty</option><option>Rain</option><option>Humid</option>
-          </select>
-        </div>
-        <div class="field"><label>Shift</label>
-          <select name="shift">
-            <option value="">Select</option><option>Day</option><option>Night</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="section-title">Checklist</div>
-      <table>
-        <thead>
-          <tr>
-            <th class="w-sn">S/N</th>
-            <th>Inspection Item</th>
-            <th class="w-cond">Condition</th>
-            <th>Remarks / Corrective Action</th>
-            <th class="w-photo">Photos</th>
-          </tr>
-        </thead>
-        <tbody>
-          
-      <tr>
-        <td class="center">1</td>
-        <td>Crane identification number and SWL load charts clearly displayed?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_1" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_1" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_1" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_1" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c1" />
-            <div class="thumb" id="c1">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">2</td>
-        <td>No visible structural damage, corrosion, or deformation.</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_2" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_2" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_2" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_2" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c2" />
-            <div class="thumb" id="c2">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">3</td>
-        <td>Housekeeping satisfactory (no loose items, oil spills, or obstructions)?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_3" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_3" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_3" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_3" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c3" />
-            <div class="thumb" id="c3">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">4</td>
-        <td>Walkways, ladders, platforms, and handrails are in good condition.</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_4" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_4" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_4" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_4" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c4" />
-            <div class="thumb" id="c4">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">5</td>
-        <td>Gantry limit sensor functioning?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_5" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_5" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_5" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_5" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c5" />
-            <div class="thumb" id="c5">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">6</td>
-        <td>Wire ropes in good condition (no broken strands, kinks, corrosion)?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_6" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_6" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_6" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_6" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c6" />
-            <div class="thumb" id="c6">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">7</td>
-        <td>Load limiters operational?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_7" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_7" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_7" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_7" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c7" />
-            <div class="thumb" id="c7">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">8</td>
-        <td>Spreaders free from damage?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_8" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_8" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_8" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_8" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c8" />
-            <div class="thumb" id="c8">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">9</td>
-        <td>Control panels secured and labelled?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_9" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_9" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_9" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_9" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c9" />
-            <div class="thumb" id="c9">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">10</td>
-        <td>Adequate lighting (cabin, walkways, boom, and landside)?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_10" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_10" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_10" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_10" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c10" />
-            <div class="thumb" id="c10">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">11</td>
-        <td>Any exposed or damaged cables?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_11" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_11" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_11" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_11" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c11" />
-            <div class="thumb" id="c11">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">12</td>
-        <td>Cabin clean and ergonomically safe?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_12" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_12" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_12" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_12" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c12" />
-            <div class="thumb" id="c12">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">13</td>
-        <td>Seat, seatbelt, joystick, and controls in good condition?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_13" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_13" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_13" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_13" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c13" />
-            <div class="thumb" id="c13">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">14</td>
-        <td>Clear visibility (windows, wipers, defoggers working)?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_14" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_14" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_14" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_14" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c14" />
-            <div class="thumb" id="c14">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">15</td>
-        <td>Fire extinguisher available and inspected?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_15" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_15" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_15" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_15" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c15" />
-            <div class="thumb" id="c15">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">16</td>
-        <td>Communication system (radio/intercom) functional?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_16" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_16" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_16" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_16" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c16" />
-            <div class="thumb" id="c16">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">17</td>
-        <td>Audible alarms and warning horns working?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_17" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_17" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_17" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_17" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c17" />
-            <div class="thumb" id="c17">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">18</td>
-        <td>Emergency stop buttons functional and accessible?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_18" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_18" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_18" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_18" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c18" />
-            <div class="thumb" id="c18">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">19</td>
-        <td>Anti-collision and interlock systems working (if applicable)?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_19" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_19" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_19" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_19" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c19" />
-            <div class="thumb" id="c19">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">20</td>
-        <td>Safe access/egress maintained (no missing gratings, covers)?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_20" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_20" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_20" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_20" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c20" />
-            <div class="thumb" id="c20">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">21</td>
-        <td>Boom angle indicator and limits working?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_21" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_21" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_21" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_21" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c21" />
-            <div class="thumb" id="c21">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">22</td>
-        <td>Trolley travel and brakes functioning?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_22" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_22" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_22" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_22" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c22" />
-            <div class="thumb" id="c22">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">23</td>
-        <td>Hoist brake functioning and no abnormal noises?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_23" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_23" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_23" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_23" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c23" />
-            <div class="thumb" id="c23">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">24</td>
-        <td>Skew control / travel alignment normal?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_24" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_24" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_24" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_24" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c24" />
-            <div class="thumb" id="c24">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">25</td>
-        <td>Storm pins / tie-downs available and in good condition?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_25" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_25" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_25" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_25" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c25" />
-            <div class="thumb" id="c25">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">26</td>
-        <td>Anemometer / wind speed display functional (if installed)?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_26" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_26" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_26" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_26" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c26" />
-            <div class="thumb" id="c26">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">27</td>
-        <td>PPE signage and safety instructions visible?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_27" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_27" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_27" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_27" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c27" />
-            <div class="thumb" id="c27">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">28</td>
-        <td>Any oil leaks from hydraulic systems?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_28" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_28" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_28" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_28" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c28" />
-            <div class="thumb" id="c28">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">29</td>
-        <td>Lubrication points maintained and no excessive grease on walkways?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_29" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_29" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_29" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_29" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c29" />
-            <div class="thumb" id="c29">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">30</td>
-        <td>Fire detection / suppression system healthy (if installed)?</td>
-        <td class="center">
-          <label class="opt"><input type="radio" name="cond_30" value="Yes"> Yes </label>
-          <label class="opt"><input type="radio" name="cond_30" value="No"> No </label>
-          <label class="opt"><input type="radio" name="cond_30" value="NA"> N/A</label>
-        </td>
-        <td><textarea class="chk-remarks" name="remarks_30" placeholder="Finding / action / responsible / due date"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="c30" />
-            <div class="thumb" id="c30">No image</div>
-          </div>
-        </td>
-      </tr>
-    
-        </tbody>
-      </table>
-
-      <div class="section-title">Observations / Recommendations</div>
-      <table>
-        <thead>
-          <tr>
-            <th class="w-sn">S/N</th>
-            <th>Observations</th>
-            <th class="w-photo">Photos</th>
-            <th>Recommendations</th>
-            <th class="w-status">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          
-      <tr>
-        <td class="center">1</td>
-        <td><textarea class="obs-ta" name="obs_1" placeholder="Describe observation"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="o1" />
-            <div class="thumb" id="o1">No image</div>
-          </div>
-        </td>
-        <td><textarea class="rec-ta" name="rec_1" placeholder="Recommendation / corrective action"></textarea></td>
-        <td>
-          <select name="status_1">
-            <option value="">Select</option>
-            <option>Open</option>
-            <option>In Progress</option>
-            <option>Closed</option>
-          </select>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">2</td>
-        <td><textarea class="obs-ta" name="obs_2" placeholder="Describe observation"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="o2" />
-            <div class="thumb" id="o2">No image</div>
-          </div>
-        </td>
-        <td><textarea class="rec-ta" name="rec_2" placeholder="Recommendation / corrective action"></textarea></td>
-        <td>
-          <select name="status_2">
-            <option value="">Select</option>
-            <option>Open</option>
-            <option>In Progress</option>
-            <option>Closed</option>
-          </select>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">3</td>
-        <td><textarea class="obs-ta" name="obs_3" placeholder="Describe observation"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="o3" />
-            <div class="thumb" id="o3">No image</div>
-          </div>
-        </td>
-        <td><textarea class="rec-ta" name="rec_3" placeholder="Recommendation / corrective action"></textarea></td>
-        <td>
-          <select name="status_3">
-            <option value="">Select</option>
-            <option>Open</option>
-            <option>In Progress</option>
-            <option>Closed</option>
-          </select>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">4</td>
-        <td><textarea class="obs-ta" name="obs_4" placeholder="Describe observation"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="o4" />
-            <div class="thumb" id="o4">No image</div>
-          </div>
-        </td>
-        <td><textarea class="rec-ta" name="rec_4" placeholder="Recommendation / corrective action"></textarea></td>
-        <td>
-          <select name="status_4">
-            <option value="">Select</option>
-            <option>Open</option>
-            <option>In Progress</option>
-            <option>Closed</option>
-          </select>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">5</td>
-        <td><textarea class="obs-ta" name="obs_5" placeholder="Describe observation"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="o5" />
-            <div class="thumb" id="o5">No image</div>
-          </div>
-        </td>
-        <td><textarea class="rec-ta" name="rec_5" placeholder="Recommendation / corrective action"></textarea></td>
-        <td>
-          <select name="status_5">
-            <option value="">Select</option>
-            <option>Open</option>
-            <option>In Progress</option>
-            <option>Closed</option>
-          </select>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">6</td>
-        <td><textarea class="obs-ta" name="obs_6" placeholder="Describe observation"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="o6" />
-            <div class="thumb" id="o6">No image</div>
-          </div>
-        </td>
-        <td><textarea class="rec-ta" name="rec_6" placeholder="Recommendation / corrective action"></textarea></td>
-        <td>
-          <select name="status_6">
-            <option value="">Select</option>
-            <option>Open</option>
-            <option>In Progress</option>
-            <option>Closed</option>
-          </select>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">7</td>
-        <td><textarea class="obs-ta" name="obs_7" placeholder="Describe observation"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="o7" />
-            <div class="thumb" id="o7">No image</div>
-          </div>
-        </td>
-        <td><textarea class="rec-ta" name="rec_7" placeholder="Recommendation / corrective action"></textarea></td>
-        <td>
-          <select name="status_7">
-            <option value="">Select</option>
-            <option>Open</option>
-            <option>In Progress</option>
-            <option>Closed</option>
-          </select>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">8</td>
-        <td><textarea class="obs-ta" name="obs_8" placeholder="Describe observation"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="o8" />
-            <div class="thumb" id="o8">No image</div>
-          </div>
-        </td>
-        <td><textarea class="rec-ta" name="rec_8" placeholder="Recommendation / corrective action"></textarea></td>
-        <td>
-          <select name="status_8">
-            <option value="">Select</option>
-            <option>Open</option>
-            <option>In Progress</option>
-            <option>Closed</option>
-          </select>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">9</td>
-        <td><textarea class="obs-ta" name="obs_9" placeholder="Describe observation"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="o9" />
-            <div class="thumb" id="o9">No image</div>
-          </div>
-        </td>
-        <td><textarea class="rec-ta" name="rec_9" placeholder="Recommendation / corrective action"></textarea></td>
-        <td>
-          <select name="status_9">
-            <option value="">Select</option>
-            <option>Open</option>
-            <option>In Progress</option>
-            <option>Closed</option>
-          </select>
-        </td>
-      </tr>
-    
-      <tr>
-        <td class="center">10</td>
-        <td><textarea class="obs-ta" name="obs_10" placeholder="Describe observation"></textarea></td>
-        <td>
-          <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="o10" />
-            <div class="thumb" id="o10">No image</div>
-          </div>
-        </td>
-        <td><textarea class="rec-ta" name="rec_10" placeholder="Recommendation / corrective action"></textarea></td>
-        <td>
-          <select name="status_10">
-            <option value="">Select</option>
-            <option>Open</option>
-            <option>In Progress</option>
-            <option>Closed</option>
-          </select>
-        </td>
-      </tr>
-    
-        </tbody>
-      </table>
-
-      <div class="section-title">Signatures</div>
-      <div class="sign-grid">
-        <div class="sigbox">
-          <b>HSE Inspector</b><br><br>
-          <label>HSE Inspector Name</label>
-          <input type="text" name="hseInspectorName" placeholder="Type name" />
-          <div style="margin-top:10px;">
-            <canvas id="sig1"></canvas>
-            <input type="hidden" name="sig_hseInspector" id="sig_hseInspector" />
-          </div>
-          <div style="margin-top:8px; display:flex; justify-content:space-between; gap:10px; align-items:center;">
-            <div><b>Date:</b> <input type="date" name="hseInspectorSignDate" style="width:170px" /></div>
-            <div class="sig-actions">
-              <button type="button" class="secondary" onclick="clearSig('sig1','sig_hseInspector')">Clear</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="sigbox">
-          <b>HSSE Manager (HSSEM)</b><br><br>
-          <label>HSSE Manager Name</label>
-          <input type="text" name="hsseManagerName" placeholder="Type name" />
-          <div style="margin-top:10px;">
-            <canvas id="sig2"></canvas>
-            <input type="hidden" name="sig_hsseManager" id="sig_hsseManager" />
-          </div>
-          <div style="margin-top:8px; display:flex; justify-content:space-between; gap:10px; align-items:center;">
-            <div><b>Date:</b> <input type="date" name="hsseManagerSignDate" style="width:170px" /></div>
-            <div class="sig-actions">
-              <button type="button" class="secondary" onclick="clearSig('sig2','sig_hsseManager')">Clear</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button type="button" onclick="sendForm()">Send</button>
-        <button type="button" class="secondary" onclick="resetAll()">Clear Form</button>
-      </div>
-    
-    <!-- FOOTER -->
-    <div class="footer">
-      <table class="footer-table" aria-label="Document Footer">
-        <thead>
-          <tr>
-            <th>Prepared By</th>
-            <th>Reviewed By</th>
-            <th>Page No</th>
-            <th>Revision</th>
-            <th>Control #</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="ft-val">HSSE Committee Team</td>
-            <td class="ft-val">Abdul Rouf</td>
-            <td class="ft-val">Page 1 of 2</td>
-            <td class="ft-val">1.0</td>
-            <td class="ft-val">CSP-HSSE-FRM-076</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    </form>
   </div>
 
- <script>
-  // 0) Put your deployed Apps Script Web App URL here (must end with /exec)
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFh8nMHkjRuUwprvUYvTZUZi1KtOFwcHsg9PNtYuOq1vlpTo3rHo2JaE_uEVcGgbrmbw/exec";
+  <div class="meta">
+    <div class="field">
+      <label>Date:</label>
+      <input type="text" id="inspectionDate" class="locked-field" readonly>
+    </div>
+    <div class="field">
+      <label>Time:</label>
+      <input type="text" id="inspectionTime" class="locked-field" readonly>
+    </div>
+    <div class="field">
+      <label>Location:</label>
+      <input type="text" placeholder="Enter Location">
+    </div>
+    <div class="field">
+        <label>Crane No:</label>
+        <input type="text" placeholder="e.g. QC-01">
+      </div>
+  </div>
 
-  // Photo preview
-  document.addEventListener('change', function(e){
-    const inp = e.target;
-    if(inp && inp.matches('input[type="file"][data-preview]')){
-      const id = inp.getAttribute('data-preview');
-      const box = document.getElementById(id);
-      const file = inp.files && inp.files[0];
-      if(!box) return;
-      if(!file){ box.textContent = "No image"; return; }
-      const url = URL.createObjectURL(file);
-      box.innerHTML = '<img alt="preview" src="' + url + '">';
-    }
-  });
+  <div class="section-title">DETAILED OBSERVATIONS & RECOMMENDATIONS</div>
+  <table id="dynamicObsTable">
+    <thead>
+      <tr>
+        <th width="5%">No.</th>
+        <th width="40%">Observation / Defect Found</th>
+        <th width="40%">Recommendation / Action Taken</th>
+        <th width="10%">Status</th>
+        <th width="5%">Action</th>
+      </tr>
+    </thead>
+    <tbody id="obsBody">
+      </tbody>
+  </table>
+  <button type="button" class="btn-add" onclick="addRow()">+ Add New Observation</button>
 
-  function resetAll(){
-    if(confirm("Clear everything?")){
-      document.getElementById('qcForm').reset();
-      document.querySelectorAll('.thumb').forEach(t => t.textContent = "No image");
-      clearSig('sig1','sig_hseInspector');
-      clearSig('sig2','sig_hsseManager');
-    }
-  }
+  <div class="section-title">AUTHORIZATION</div>
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+    <div class="sigbox">
+      <label>HSE Inspector Signature:</label>
+      <canvas id="sig1"></canvas>
+      <button class="btn-del" onclick="clearSig('sig1')">Clear</button>
+    </div>
+    <div class="sigbox">
+      <label>Manager Signature:</label>
+      <canvas id="sig2"></canvas>
+      <button class="btn-del" onclick="clearSig('sig2')">Clear</button>
+    </div>
+  </div>
 
-  // Digital signature pads (touch + mouse)
-  function setupPad(canvasId, hiddenId){
-    const canvas = document.getElementById(canvasId);
-    const hidden = document.getElementById(hiddenId);
-    const ctx = canvas.getContext('2d');
-    let drawing = false;
+  <div class="actions">
+    <button class="submit-btn" onclick="submitForm()">Submit Checklist</button>
+  </div>
+</div>
 
-    function resize(){
-      const rect = canvas.getBoundingClientRect();
-      const ratio = window.devicePixelRatio || 1;
-      canvas.width = Math.floor(rect.width * ratio);
-      canvas.height = Math.floor(rect.height * ratio);
-      ctx.setTransform(ratio,0,0,ratio,0,0);
-      ctx.lineWidth = 2.2;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.strokeStyle = '#000';
-    }
-
-    function pos(ev){
-      const r = canvas.getBoundingClientRect();
-      const e = ev.touches ? ev.touches[0] : ev;
-      return { x: e.clientX - r.left, y: e.clientY - r.top };
-    }
-
-    function start(ev){ ev.preventDefault(); drawing = true; const p = pos(ev); ctx.beginPath(); ctx.moveTo(p.x,p.y); }
-    function move(ev){ if(!drawing) return; ev.preventDefault(); const p = pos(ev); ctx.lineTo(p.x,p.y); ctx.stroke(); }
-    function end(ev){
-      if(!drawing) return;
-      ev.preventDefault();
-      drawing = false;
-      if(hidden) hidden.value = canvas.toDataURL('image/png');
-    }
-
-    canvas.addEventListener('mousedown', start);
-    canvas.addEventListener('mousemove', move);
-    window.addEventListener('mouseup', end);
-
-    canvas.addEventListener('touchstart', start, {passive:false});
-    canvas.addEventListener('touchmove', move, {passive:false});
-    window.addEventListener('touchend', end, {passive:false});
-
-    resize();
-    window.addEventListener('resize', resize);
-  }
-
-  function clearSig(canvasId, hiddenId){
-    const c = document.getElementById(canvasId);
-    const ctx = c.getContext('2d');
-    ctx.clearRect(0,0,c.width,c.height);
-    const h = document.getElementById(hiddenId);
-    if(h) h.value = '';
-  }
-
+<script>
+  // --- 1. AUTOMATIC DATE & TIME ---
   document.addEventListener('DOMContentLoaded', () => {
-    setupPad('sig1','sig_hseInspector');
-    setupPad('sig2','sig_hsseManager');
+    const now = new Date();
+    document.getElementById('inspectionDate').value = now.toLocaleDateString('en-GB');
+    document.getElementById('inspectionTime').value = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    addRow(); // Start with one empty row
+    setupCanvas('sig1');
+    setupCanvas('sig2');
   });
 
-  // Convert file input -> base64
-  function fileToDataURL(file) {
-    return new Promise((resolve) => {
-      if (!file) return resolve("");
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result || ""));
-      reader.onerror = () => resolve("");
-      reader.readAsDataURL(file);
+  // --- 2. DYNAMIC TABLE LOGIC ---
+  let rowCount = 0;
+  function addRow() {
+    rowCount++;
+    const tbody = document.getElementById('obsBody');
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td style="text-align:center">${rowCount}</td>
+      <td><textarea placeholder="Describe defect..."></textarea></td>
+      <td><textarea placeholder="Corrective action..."></textarea></td>
+      <td>
+        <select>
+          <option>Open</option>
+          <option>In Progress</option>
+          <option>Closed</option>
+        </select>
+      </td>
+      <td style="text-align:center">
+        <button class="btn-del" onclick="removeRow(this)">X</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  }
+
+  function removeRow(btn) {
+    btn.closest('tr').remove();
+    reindexRows();
+  }
+
+  function reindexRows() {
+    const rows = document.querySelectorAll('#obsBody tr');
+    rowCount = 0;
+    rows.forEach(row => {
+      rowCount++;
+      row.cells[0].innerText = rowCount;
     });
   }
 
-  async function sendForm() {
-    const form = document.getElementById("qcForm");
-    const fd = new FormData(form);
+  // --- 3. SIGNATURE PAD LOGIC ---
+  function setupCanvas(id) {
+    const canvas = document.getElementById(id);
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
 
-    fd.append("formTitle", "Quay Crane (QC) Inspection Checklist");
+    canvas.addEventListener('mousedown', () => drawing = true);
+    window.addEventListener('mouseup', () => { drawing = false; ctx.beginPath(); });
+    canvas.addEventListener('mousemove', (e) => {
+      if (!drawing) return;
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      const rect = canvas.getBoundingClientRect();
+      ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+      ctx.stroke();
+    });
+  }
 
-    // Checklist photos c1..c30
-    for (let i = 1; i <= 30; i++) {
-      const input = form.querySelector(`input[type="file"][data-preview="c${i}"]`);
-      const file = input && input.files && input.files[0] ? input.files[0] : null;
-      fd.append(`photo_c${i}`, await fileToDataURL(file));
-    }
+  function clearSig(id) {
+    const canvas = document.getElementById(id);
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
 
-    // Observation photos o1..o10
-    for (let i = 1; i <= 10; i++) {
-      const input = form.querySelector(`input[type="file"][data-preview="o${i}"]`);
-      const file = input && input.files && input.files[0] ? input.files[0] : null;
-      fd.append(`photo_o${i}`, await fileToDataURL(file));
-    }
-
-    if (!SCRIPT_URL || SCRIPT_URL.includes("PASTE_")) {
-      alert("SCRIPT_URL is not set. Paste your Google Web App /exec URL.");
-      return;
-    }
-
-    try {
-      await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: fd });
-      alert("Submitted successfully. PDF will be emailed to you.");
-    } catch (e) {
-      alert("Submit failed. Check SCRIPT_URL and Apps Script deployment.");
-    }
+  // --- 4. SUBMIT ACTION ---
+  function submitForm() {
+    alert("Checklist Ready! Next step: Connect to Google API to send the PDF.");
   }
 </script>
+
 </body>
 </html>
