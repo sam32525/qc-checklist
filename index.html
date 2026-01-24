@@ -3,26 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Quay Crane (QC) Inspection Checklist</title>
+  <title>Quay Crane (QC) Inspection Checklist - Complete Form</title>
   <style>
-    body{ font-family: Arial, sans-serif; background:#f4f6f8; padding:20px; color:#000; }
+    body{ font-family: Arial, Helvetica, sans-serif; background:#f4f6f8; padding:20px; color:#000; }
     .page{ max-width: 1200px; margin:auto; background:#fff; border:1px solid #000; padding:18px; }
-    .header{ margin:6px 0 18px; border-bottom: 2px solid #0b4f8a; padding-bottom: 10px; }
-    .header .org{ font-size:18px; font-weight:700; color:#0b4f8a; text-align:left; }
+    .header{ margin:6px 0 18px; text-align:center; }
+    .header .org{ font-size:18px; font-weight:700; color:#6b6b6b; text-align:left; }
     .header .title{ font-size:15px; font-weight:700; text-decoration:underline; margin-top:10px; text-align:center; }
     .meta{ display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin: 14px 0 12px; }
-    .meta label{ font-size:12px; font-weight:700; display:block; margin-bottom:4px; }
+    .meta .field label{ font-size:12px; font-weight:700; display:block; margin-bottom:4px; }
     input[type="text"], select{ width:100%; border:1px solid #666; border-radius:4px; padding:6px; font-size:13px; box-sizing: border-box; }
     .locked-field { background-color: #eeeeee; cursor: not-allowed; }
-    table{ width:100%; border-collapse:collapse; margin-bottom:15px; }
-    th, td{ border:1px solid #000; padding:8px; font-size:13px; }
-    th{ background:#f2f2f2; font-weight:700; }
-    .section-title{ background:#e8f1fb; border:1px solid #0b4f8a; color:#0b4f8a; padding:6px 10px; font-weight:700; text-align:center; margin-top:20px; }
+    table{ width:100%; border-collapse:collapse; margin-bottom:10px; }
+    th, td{ border:1px solid #000; padding:8px; font-size:13px; vertical-align:top; }
+    th{ background:#f2f2f2; font-weight:700; text-align:center; }
+    .section-title{ background:#e8f1fb; border:1px solid #0b4f8a; color:#0b4f8a; padding:6px 10px; font-weight:700; text-align:center; margin-top:18px; margin-bottom:8px; }
     .btn-add{ background:#0b4f8a; color:white; padding:8px 15px; border:none; border-radius:4px; cursor:pointer; margin: 10px 0; font-weight:bold; }
-    .btn-del{ color:red; font-weight:bold; border:none; background:none; cursor:pointer; }
+    .btn-del{ color:red; font-weight:bold; border:none; background:none; cursor:pointer; font-size:16px; }
     .sigbox{ border:1px solid #000; padding:10px; text-align:center; }
     canvas{ width:100%; height:100px; border:1px dotted #999; background:#fafafa; touch-action:none; }
-    .submit-btn{ background:#1e8e3e; color:white; padding:12px 40px; font-size:18px; border:none; border-radius:5px; cursor:pointer; font-weight:700; }
+    .actions{ text-align:center; margin-top:20px; }
+    .submit-btn{ background:#1e8e3e; color:white; padding:10px 30px; font-size:16px; border:none; border-radius:5px; cursor:pointer; font-weight:700; }
   </style>
 </head>
 <body>
@@ -52,24 +53,68 @@
     </div>
   </div>
 
-  <div class="section-title">INSPECTION ITEMS (1 - 30)</div>
+  <div class="section-title">1. DOCUMENTATION & CABIN CONDITION</div>
   <table>
-    <thead><tr><th width="5%">No.</th><th>Inspection Point</th><th width="8%">Safe</th><th width="8%">Unsafe</th><th width="8%">N/A</th></tr></thead>
-    <tbody id="staticChecklist">
-        <script>
-            // This is just to demonstrate the 1-30 numbering remains static
-            const points = [
-                "Operator's license valid","Third Party Certificate","Cabin cleanliness","Controls & Joysticks","Monitor displays",
-                "Wipers & Washers","Emergency Stops","Anemometer","Anti-collision sensors","Load cell/Overload",
-                "Brakes (Gantry/Trolley)","Siren/Warning lights","Limit switches","Structural cracks","Wire ropes",
-                "Sheaves & Drums","Spreader condition","Trolley rails","Anchoring pins","Electric cables",
-                "Panels & Boxes","Hydraulic leaks","Oil levels","Fire extinguishers","Walkways & Handrails",
-                "Lighting","Housekeeping","Warning signs","PPE availability","First Aid Kit"
-            ];
-            points.forEach((text, i) => {
-                document.write(`<tr><td>${i+1}</td><td>${text}</td><td><input type="radio" name="r${i}"></td><td><input type="radio" name="r${i}"></td><td><input type="radio" name="r${i}"></td></tr>`);
-            });
-        </script>
+    <thead><tr><th width="5%">No.</th><th>Item / Description</th><th width="8%">Safe</th><th width="8%">Unsafe</th><th width="8%">N/A</th></tr></thead>
+    <tbody>
+      <tr><td>1.1</td><td>Operator's license valid and available</td><td><input type="radio" name="i1.1" value="S"></td><td><input type="radio" name="i1.1" value="U"></td><td><input type="radio" name="i1.1" value="NA"></td></tr>
+      <tr><td>1.2</td><td>Valid Third Party Inspection Certificate available</td><td><input type="radio" name="i1.2" value="S"></td><td><input type="radio" name="i1.2" value="U"></td><td><input type="radio" name="i1.2" value="NA"></td></tr>
+      <tr><td>1.3</td><td>Cabin cleanliness and visibility (glass clear)</td><td><input type="radio" name="i1.3" value="S"></td><td><input type="radio" name="i1.3" value="U"></td><td><input type="radio" name="i1.3" value="NA"></td></tr>
+      <tr><td>1.4</td><td>Cabin controls and joy sticks functioning</td><td><input type="radio" name="i1.4" value="S"></td><td><input type="radio" name="i1.4" value="U"></td><td><input type="radio" name="i1.4" value="NA"></td></tr>
+      <tr><td>1.5</td><td>Display monitors and indicators working</td><td><input type="radio" name="i1.5" value="S"></td><td><input type="radio" name="i1.5" value="U"></td><td><input type="radio" name="i1.5" value="NA"></td></tr>
+      <tr><td>1.6</td><td>Wipers and washers functional</td><td><input type="radio" name="i1.6" value="S"></td><td><input type="radio" name="i1.6" value="U"></td><td><input type="radio" name="i1.6" value="NA"></td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">2. SAFETY DEVICES & INDICATORS</div>
+  <table>
+    <thead><tr><th width="5%">No.</th><th>Item / Description</th><th width="8%">Safe</th><th width="8%">Unsafe</th><th width="8%">N/A</th></tr></thead>
+    <tbody>
+      <tr><td>2.1</td><td>Emergency Stop Buttons functional</td><td><input type="radio" name="i2.1" value="S"></td><td><input type="radio" name="i2.1" value="U"></td><td><input type="radio" name="i2.1" value="NA"></td></tr>
+      <tr><td>2.2</td><td>Anemometer (Wind Speed) working correctly</td><td><input type="radio" name="i2.2" value="S"></td><td><input type="radio" name="i2.2" value="U"></td><td><input type="radio" name="i2.2" value="NA"></td></tr>
+      <tr><td>2.3</td><td>Anti-Collision Sensors operational</td><td><input type="radio" name="i2.3" value="S"></td><td><input type="radio" name="i2.3" value="U"></td><td><input type="radio" name="i2.3" value="NA"></td></tr>
+      <tr><td>2.4</td><td>Load Cell / Overload Protection functional</td><td><input type="radio" name="i2.4" value="S"></td><td><input type="radio" name="i2.4" value="U"></td><td><input type="radio" name="i2.4" value="NA"></td></tr>
+      <tr><td>2.5</td><td>Brakes (Gantry, Trolley, Hoist) functioning</td><td><input type="radio" name="i2.5" value="S"></td><td><input type="radio" name="i2.5" value="U"></td><td><input type="radio" name="i2.5" value="NA"></td></tr>
+      <tr><td>2.6</td><td>Siren and Warning Lights functional</td><td><input type="radio" name="i2.6" value="S"></td><td><input type="radio" name="i2.6" value="U"></td><td><input type="radio" name="i2.6" value="NA"></td></tr>
+      <tr><td>2.7</td><td>Limit Switches (Upper/Lower, End of Travel)</td><td><input type="radio" name="i2.7" value="S"></td><td><input type="radio" name="i2.7" value="U"></td><td><input type="radio" name="i2.7" value="NA"></td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">3. MECHANICAL & STRUCTURAL CONDITION</div>
+  <table>
+    <thead><tr><th width="5%">No.</th><th>Item / Description</th><th width="8%">Safe</th><th width="8%">Unsafe</th><th width="8%">N/A</th></tr></thead>
+    <tbody>
+      <tr><td>3.1</td><td>Main structure free from visible cracks/damage</td><td><input type="radio" name="i3.1" value="S"></td><td><input type="radio" name="i3.1" value="U"></td><td><input type="radio" name="i3.1" value="NA"></td></tr>
+      <tr><td>3.2</td><td>Wire Ropes (Main Hoist, Boom, Trolley) condition</td><td><input type="radio" name="i3.2" value="S"></td><td><input type="radio" name="i3.2" value="U"></td><td><input type="radio" name="i3.2" value="NA"></td></tr>
+      <tr><td>3.3</td><td>Sheaves and Drums condition</td><td><input type="radio" name="i3.3" value="S"></td><td><input type="radio" name="i3.3" value="U"></td><td><input type="radio" name="i3.3" value="NA"></td></tr>
+      <tr><td>3.4</td><td>Spreader condition (Twist locks, Flippers)</td><td><input type="radio" name="i3.4" value="S"></td><td><input type="radio" name="i3.4" value="U"></td><td><input type="radio" name="i3.4" value="NA"></td></tr>
+      <tr><td>3.5</td><td>Trolley Rails and Gantry Tracks free from debris</td><td><input type="radio" name="i3.5" value="S"></td><td><input type="radio" name="i3.5" value="U"></td><td><input type="radio" name="i3.5" value="NA"></td></tr>
+      <tr><td>3.6</td><td>Anchoring / Storm Pins functional</td><td><input type="radio" name="i3.6" value="S"></td><td><input type="radio" name="i3.6" value="U"></td><td><input type="radio" name="i3.6" value="NA"></td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">4. ELECTRICAL & HYDRAULIC SYSTEMS</div>
+  <table>
+    <thead><tr><th width="5%">No.</th><th>Item / Description</th><th width="8%">Safe</th><th width="8%">Unsafe</th><th width="8%">N/A</th></tr></thead>
+    <tbody>
+      <tr><td>4.1</td><td>Electric Cables and Festive condition</td><td><input type="radio" name="i4.1" value="S"></td><td><input type="radio" name="i4.1" value="U"></td><td><input type="radio" name="i4.1" value="NA"></td></tr>
+      <tr><td>4.2</td><td>Panels and Junction Boxes closed/secured</td><td><input type="radio" name="i4.2" value="S"></td><td><input type="radio" name="i4.2" value="U"></td><td><input type="radio" name="i4.2" value="NA"></td></tr>
+      <tr><td>4.3</td><td>Hydraulic hoses and fittings free from leaks</td><td><input type="radio" name="i4.3" value="S"></td><td><input type="radio" name="i4.3" value="U"></td><td><input type="radio" name="i4.3" value="NA"></td></tr>
+      <tr><td>4.4</td><td>Oil levels (Hydraulic, Gearbox) adequate</td><td><input type="radio" name="i4.4" value="S"></td><td><input type="radio" name="i4.4" value="U"></td><td><input type="radio" name="i4.4" value="NA"></td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">5. GENERAL SAFETY & HOUSEKEEPING</div>
+  <table>
+    <thead><tr><th width="5%">No.</th><th>Item / Description</th><th width="8%">Safe</th><th width="8%">Unsafe</th><th width="8%">N/A</th></tr></thead>
+    <tbody>
+      <tr><td>5.1</td><td>Fire Extinguishers available and charged</td><td><input type="radio" name="i5.1" value="S"></td><td><input type="radio" name="i5.1" value="U"></td><td><input type="radio" name="i5.1" value="NA"></td></tr>
+      <tr><td>5.2</td><td>Access Walkways, Ladders, Handrails secure</td><td><input type="radio" name="i5.2" value="S"></td><td><input type="radio" name="i5.2" value="U"></td><td><input type="radio" name="i5.2" value="NA"></td></tr>
+      <tr><td>5.3</td><td>Lighting (Flood lights, Cabin lights) operational</td><td><input type="radio" name="i5.3" value="S"></td><td><input type="radio" name="i5.3" value="U"></td><td><input type="radio" name="i5.3" value="NA"></td></tr>
+      <tr><td>5.4</td><td>Housekeeping on crane platforms</td><td><input type="radio" name="i5.4" value="S"></td><td><input type="radio" name="i5.4" value="U"></td><td><input type="radio" name="i5.4" value="NA"></td></tr>
+      <tr><td>5.5</td><td>Warning Signs and Load Charts posted</td><td><input type="radio" name="i5.5" value="S"></td><td><input type="radio" name="i5.5" value="U"></td><td><input type="radio" name="i5.5" value="NA"></td></tr>
+      <tr><td>5.6</td><td>PPE (Personal Protective Equipment) available</td><td><input type="radio" name="i5.6" value="S"></td><td><input type="radio" name="i5.6" value="U"></td><td><input type="radio" name="i5.6" value="NA"></td></tr>
+      <tr><td>5.7</td><td>First Aid Kit available</td><td><input type="radio" name="i5.7" value="S"></td><td><input type="radio" name="i5.7" value="U"></td><td><input type="radio" name="i5.7" value="NA"></td></tr>
     </tbody>
   </table>
 
@@ -80,91 +125,93 @@
         <th width="5%">No.</th>
         <th>Observation / Defect Found</th>
         <th>Recommendation / Action Taken</th>
-        <th width="5%">Del</th>
+        <th width="5%">Action</th>
       </tr>
     </thead>
     <tbody id="obsBody">
       </tbody>
   </table>
-  <button type="button" class="btn-add" onclick="addRow()">+ Add Observation Row</button>
+  <button type="button" class="btn-add" onclick="addRow()">+ Add New Observation</button>
 
   <div class="section-title">AUTHORIZATION</div>
   <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-top:10px;">
     <div class="sigbox">
-      <label>HSE Inspector Signature</label>
+      <label style="font-size:12px; font-weight:700;">HSE Inspector Signature</label>
       <canvas id="sig1"></canvas>
       <button type="button" class="btn-del" onclick="clearSig('sig1')">Clear</button>
     </div>
     <div class="sigbox">
-      <label>Manager Signature</label>
+      <label style="font-size:12px; font-weight:700;">HSSE Manager Signature</label>
       <canvas id="sig2"></canvas>
       <button type="button" class="btn-del" onclick="clearSig('sig2')">Clear</button>
     </div>
   </div>
 
-  <div style="text-align:center; margin-top:30px;">
+  <div class="actions">
     <button type="button" class="submit-btn" onclick="sendForm()">Submit Checklist</button>
   </div>
 </div>
 
 <script>
-    // AUTO DATE/TIME
-    document.addEventListener('DOMContentLoaded', () => {
-      const now = new Date();
-      document.getElementById('inspectionDate').value = now.toLocaleDateString('en-GB');
-      document.getElementById('inspectionTime').value = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-      addRow(); // Initial dynamic row
-      setupPad('sig1'); setupPad('sig2');
-    });
+  // --- 1. AUTO DATE & TIME ---
+  document.addEventListener('DOMContentLoaded', () => {
+    const now = new Date();
+    document.getElementById('inspectionDate').value = now.toLocaleDateString('en-GB');
+    document.getElementById('inspectionTime').value = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    addRow(); 
+    setupPad('sig1');
+    setupPad('sig2');
+  });
 
-    // DYNAMIC TABLE LOGIC
-    let obsCount = 0;
-    function addRow() {
-      obsCount++;
-      const tbody = document.getElementById('obsBody');
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td style="text-align:center">${obsCount}</td>
-        <td><input type="text" style="border:none; width:98%" placeholder="Enter observation..."></td>
-        <td><input type="text" style="border:none; width:98%" placeholder="Enter recommendation..."></td>
-        <td style="text-align:center"><button type="button" class="btn-del" onclick="removeRow(this)">X</button></td>
-      `;
-      tbody.appendChild(tr);
-    }
+  // --- 2. DYNAMIC TABLE LOGIC ---
+  let rowCount = 0;
+  function addRow() {
+    rowCount++;
+    const tbody = document.getElementById('obsBody');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="text-align:center">${rowCount}</td>
+      <td><input type="text" placeholder="Observation" style="width:98%; border:none;"></td>
+      <td><input type="text" placeholder="Recommendation" style="width:98%; border:none;"></td>
+      <td style="text-align:center"><button type="button" class="btn-del" onclick="removeRow(this)">X</button></td>
+    `;
+    tbody.appendChild(tr);
+  }
 
-    function removeRow(btn) {
-      btn.closest('tr').remove();
-      const rows = document.querySelectorAll('#obsBody tr');
-      obsCount = 0;
-      rows.forEach(r => { obsCount++; r.cells[0].innerText = obsCount; });
-    }
+  function removeRow(btn) {
+    btn.closest('tr').remove();
+    const rows = document.querySelectorAll('#obsBody tr');
+    rowCount = 0;
+    rows.forEach(r => { rowCount++; r.cells[0].innerText = rowCount; });
+  }
 
-    // SIGNATURE PAD LOGIC
-    function setupPad(id) {
-      const canvas = document.getElementById(id);
-      const ctx = canvas.getContext('2d');
-      let drawing = false;
-      const getPos = (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const cx = e.touches ? e.touches[0].clientX : e.clientX;
-        const cy = e.touches ? e.touches[0].clientY : e.clientY;
-        return { x: cx - rect.left, y: cy - rect.top };
-      };
-      canvas.addEventListener('mousedown', (e) => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); });
-      canvas.addEventListener('mousemove', (e) => { if(!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); });
-      window.addEventListener('mouseup', () => drawing = false);
-      canvas.addEventListener('touchstart', (e) => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); e.preventDefault(); }, {passive:false});
-      canvas.addEventListener('touchmove', (e) => { if(!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); }, {passive:false});
-    }
+  // --- 3. SIGNATURE PAD LOGIC ---
+  function setupPad(id) {
+    const canvas = document.getElementById(id);
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+    const getPos = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: cx - rect.left, y: cy - rect.top };
+    };
+    canvas.addEventListener('mousedown', (e) => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); });
+    canvas.addEventListener('mousemove', (e) => { if(!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); });
+    window.addEventListener('mouseup', () => drawing = false);
+    canvas.addEventListener('touchstart', (e) => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); e.preventDefault(); }, {passive:false});
+    canvas.addEventListener('touchmove', (e) => { if(!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); }, {passive:false});
+  }
 
-    function clearSig(id) {
-      const c = document.getElementById(id);
-      c.getContext('2d').clearRect(0,0,c.width,c.height);
-    }
+  function clearSig(id) {
+    const c = document.getElementById(id);
+    c.getContext('2d').clearRect(0,0,c.width,c.height);
+  }
 
-    function sendForm() {
-      alert("System Ready. All 30 items preserved. Dynamic observations active.");
-    }
+  function sendForm() {
+    alert("Checklist Ready for Submission!");
+  }
 </script>
+
 </body>
 </html>
