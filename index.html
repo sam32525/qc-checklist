@@ -146,9 +146,9 @@
     .submit-btn:hover{
       background:#166b2e;
     }
-
-    /* ADDED ONLY THESE TWO CLASSES FOR THE BUTTONS */
-    .btn-add { background:#0b4f8a; color:white; border:none; padding:4px 10px; border-radius:3px; cursor:pointer; margin-bottom:5px; font-weight:bold; }
+    
+    /* ADDED FOR OBSERVATION TABLE ONLY */
+    .btn-add { background:#0b4f8a; color:white; border:none; padding:4px 10px; border-radius:3px; cursor:pointer; margin-bottom:5px; }
     .btn-del { color:red; font-weight:bold; border:none; background:none; cursor:pointer; }
   </style>
 </head>
@@ -163,33 +163,19 @@
   <div class="meta">
     <div class="field">
       <label>Date of Inspection:</label>
-      <input type="text" id="autoDate" readonly style="background:#eee;">
+      <input type="text" id="autoDate" readonly>
     </div>
     <div class="field">
       <label>Time of Inspection:</label>
-      <input type="text" id="autoTime" readonly style="background:#eee;">
+      <input type="text" id="autoTime" readonly>
     </div>
-    <div class="field">
-      <label>Location:</label>
-      <input type="text" placeholder="e.g. Berth 1">
-    </div>
-    <div class="field">
-      <label>Crane No:</label>
-      <input type="text" placeholder="e.g. QC-01">
-    </div>
+    <div class="field"><label>Location:</label><input type="text" placeholder="e.g. Berth 1"></div>
+    <div class="field"><label>Crane No:</label><input type="text" placeholder="e.g. QC-01"></div>
   </div>
 
   <div class="section-title">1. DOCUMENTATION & CABIN CONDITION</div>
   <table>
-    <thead>
-      <tr>
-        <th style="width:5%;">No.</th>
-        <th>Item / Description</th>
-        <th class="check-col">Safe</th>
-        <th class="check-col">Unsafe</th>
-        <th class="check-col">N/A</th>
-      </tr>
-    </thead>
+    <thead><tr><th style="width:5%;">No.</th><th>Item / Description</th><th class="check-col">Safe</th><th class="check-col">Unsafe</th><th class="check-col">N/A</th></tr></thead>
     <tbody>
       <tr><td>1.1</td><td>Operator's license valid and available</td><td class="check-col"><input type="radio" name="q1.1"></td><td class="check-col"><input type="radio" name="q1.1"></td><td class="check-col"><input type="radio" name="q1.1"></td></tr>
       <tr><td>1.2</td><td>Valid Third Party Inspection Certificate available</td><td class="check-col"><input type="radio" name="q1.2"></td><td class="check-col"><input type="radio" name="q1.2"></td><td class="check-col"><input type="radio" name="q1.2"></td></tr>
@@ -253,8 +239,8 @@
   </table>
 
   <div class="section-title">DETAILED OBSERVATIONS & RECOMMENDATIONS</div>
-  <button type="button" class="btn-add" onclick="addRow()">+ Add Observation</button>
-  <table id="obsTable">
+  <button type="button" class="btn-add" onclick="addRow()">+ Add Observation Row</button>
+  <table>
     <thead>
       <tr>
         <th style="width:5%;">No.</th>
@@ -287,18 +273,18 @@
 </div>
 
 <script>
-    // 1. AUTO DATE & TIME LOGIC
+    // AUTOMATIC DATE AND TIME
     document.addEventListener('DOMContentLoaded', () => {
       const now = new Date();
       document.getElementById('autoDate').value = now.toLocaleDateString('en-GB');
       document.getElementById('autoTime').value = now.toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit'});
       
-      addRow(); // Start with 1 row
+      addRow(); // Adds the first row on load
       setupPad('sig1');
       setupPad('sig2');
     });
 
-    // 2. DYNAMIC OBSERVATION TABLE LOGIC
+    // ADD AND DELETE OBSERVATION ROWS
     let obsCount = 0;
     function addRow() {
       obsCount++;
@@ -323,7 +309,7 @@
       });
     }
 
-    // 3. SIGNATURE LOGIC (Your exact logic)
+    // YOUR SIGNATURE LOGIC
     function setupPad(canvasId){
       const canvas = document.getElementById(canvasId);
       const ctx = canvas.getContext('2d');
