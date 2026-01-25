@@ -1344,7 +1344,7 @@
       const form = e.currentTarget;
 
       // Quick guard: ensure action URL is replaced
-      if((form.action || '').includes('PASTE_YOUR_WEBAPP_EXEC_URL_HERE')){
+      if((form.action || '').includes('https://script.google.com/macros/s/AKfycbymq8CGwn3YkuMuefpgITEzHGisxSv_j3gGWYNeGFIZ0vVWi3L_rS3Z_xl_JrgxcydVzw/exec')){
         showStatus('Replace the form action URL with your WebApp /exec link first ❌', false);
         return;
       }
