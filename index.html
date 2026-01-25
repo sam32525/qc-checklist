@@ -5,11 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Quay Crane (QC) Inspection Checklist - Complete Form</title>
 
-  <!-- ✅ Libraries for AUTOMATIC PDF (Option 1) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
   <style>
+    :root{
+      --csp-blue:#0b4f8a;
+      --csp-light:#e8f1fb;
+      --csp-grey:#f2f2f2;
+      --csp-dark:#1f2937;
+      --line:#111;
+      --soft:#6b7280;
+    }
+
     body{
       font-family: Arial, Helvetica, sans-serif;
       background:#f4f6f8;
@@ -27,15 +32,21 @@
       padding-bottom:160px;
     }
 
+    /* Header */
     .header{ margin:6px 0 18px; text-align:center; }
-    .header .org{
-      font-size:18px; font-weight:700;
-      color:#6b6b6b; text-align:left;
+    .header-with-logo{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      align-items:center;
+      gap:16px;
+      border-bottom:3px solid var(--csp-blue);
+      padding-bottom:10px;
+      margin-bottom:12px;
     }
-    .header .title{
-      font-size:15px; font-weight:700;
-      text-decoration:underline; margin-top:10px; text-align:center;
-    }
+    .header-text{ display:flex; flex-direction:column; gap:6px; }
+    .header .org{ font-size:18px; font-weight:700; color:var(--csp-blue); text-align:left; }
+    .header .title{ font-size:15px; font-weight:700; text-decoration:underline; margin-top:10px; text-align:center; color:var(--csp-dark); }
+    .hdr-logo{ height:75px; width:auto; justify-self:end; }
 
     .meta{
       display:grid;
@@ -43,7 +54,12 @@
       gap:10px;
       margin: 14px 0 12px;
     }
-    .field label{ font-size:12px; font-weight:700; display:block; margin-bottom:4px; }
+    .field label{
+      font-size:12px;
+      font-weight:700;
+      display:block;
+      margin-bottom:4px;
+    }
     input[type="text"], input[type="date"], input[type="time"], select, textarea{
       width:100%;
       border:1px solid #666;
@@ -57,19 +73,19 @@
     .locked{ background:#f2f2f2; pointer-events:none; }
 
     .section-title{
-      text-align:center;
+      background:var(--csp-light);
+      border:1px solid var(--csp-blue);
+      color:var(--csp-blue);
+      padding:6px 10px;
       font-weight:700;
       margin:18px 0 8px;
-      background:#e8f1fb;
-      border:1px solid #0b4f8a;
-      color:#0b4f8a;
-      padding:6px 10px;
+      text-align:center;
       text-decoration:none;
     }
 
     table{ width:100%; border-collapse:collapse; }
     th, td{ border:1px solid #000; padding:8px; font-size:13px; vertical-align:top; }
-    th{ background:#f2f2f2 !important; color:#1f2937; }
+    th{ background:var(--csp-grey) !important; color:var(--csp-dark); }
     .center{ text-align:center; }
     .w-sn{ width:55px; }
     .w-cond{ width:220px; }
@@ -78,6 +94,7 @@
 
     .opt{ margin-right:10px; white-space:nowrap; display:inline-block; }
 
+    /* Photo cell */
     .photo-cell{
       border:1px dashed #777;
       padding:6px;
@@ -89,6 +106,7 @@
     }
     .photo-cell input[type="file"]{ width:100%; font-size:12px; }
     .thumb{
+      margin-top:0;
       height:110px;
       border:1px solid #bbb;
       display:flex;
@@ -101,44 +119,23 @@
     }
     .thumb img{ width:100%; height:100%; object-fit:contain; }
 
+    /* Textareas */
     .obs-ta, .rec-ta{ height:110px; min-height:110px; max-height:220px; }
     .chk-remarks{ height:70px; min-height:70px; max-height:160px; }
 
-    .sign-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top:10px; }
-    .sigbox{ border:1px solid #000; padding:10px; }
-    canvas{
-      width:100%;
-      height:130px;
-      border:1px solid #000;
-      border-radius:6px;
-      background:#fff;
-      touch-action:none;
-    }
-
+    /* Buttons */
     button{
       padding:8px 14px;
       font-size:14px;
-      border:1px solid #0b4f8a;
-      background:#0b4f8a;
+      border:1px solid var(--csp-blue);
+      background:var(--csp-blue);
       color:#fff;
       border-radius:6px;
       cursor:pointer;
     }
-    button.secondary{
-      background:#fff;
-      color:#0b4f8a;
-      border-color:#0b4f8a;
-    }
-    button.danger{
-      background:#c0392b;
-      border-color:#c0392b;
-      color:#fff;
-    }
-    button.secondary.danger{
-      background:#fff;
-      color:#c0392b;
-      border-color:#c0392b;
-    }
+    button.secondary{ background:#fff; color:var(--csp-blue); }
+    button.danger{ background:#c0392b; border-color:#c0392b; color:#fff; }
+    button.secondary.danger{ background:#fff; color:#c0392b; border-color:#c0392b; }
 
     .actions{
       margin-top:18px;
@@ -148,20 +145,25 @@
       flex-wrap:wrap;
     }
 
-    /* Header logo */
-    .header-with-logo{
+    /* Signatures */
+    .sign-grid{
       display:grid;
-      grid-template-columns: 1fr auto;
-      align-items:center;
+      grid-template-columns: 1fr 1fr;
       gap:16px;
-      border-bottom:3px solid #0b4f8a;
-      padding-bottom:10px;
-      margin-bottom:12px;
+      margin-top:10px;
     }
-    .header-text{ display:flex; flex-direction:column; gap:6px; }
-    .hdr-logo{ height:75px; width:auto; justify-self:end; }
+    .sigbox{ border:1px solid #000; padding:10px; }
+    canvas{
+      width:100%;
+      height:130px;
+      border:1px solid #000;
+      border-radius:6px;
+      background:#fff;
+      touch-action:none;
+    }
+    .sig-actions{ display:flex; gap:10px; margin-top:8px; justify-content:flex-end; }
 
-    /* Footer inside page */
+    /* Footer inside border */
     .footer{
       position:absolute;
       left:18px;
@@ -172,6 +174,8 @@
     }
     .footer-table{
       width:100% !important;
+      max-width:100%;
+      margin:0;
       border-collapse:collapse;
       table-layout:fixed;
       font-size:12px;
@@ -180,73 +184,31 @@
       border:1px solid #6b7280;
       padding:6px 8px;
       text-align:center;
-      font-weight:600;
-      color:#4b5563;
     }
     .footer-table th{
       background:#ffffff !important;
       color:#6b7280;
       font-weight:700;
     }
+    .footer-table td{
+      font-weight:600;
+      color:#4b5563;
+    }
 
-    /* Hidden report container used for PDF rendering */
-    #pdfReportWrapper{
-      position: fixed;
-      left: -99999px;
-      top: 0;
-      width: 794px; /* ~A4 @ 96dpi */
-      background:#fff;
-      color:#000;
+    /* Print */
+    @media print{
+      body{ background:#fff; padding:0; }
+      .page{ border:none; min-height:auto; padding-bottom:0; }
+      .actions, .sig-actions, #addObsRowBtn, .obs-del-btn{ display:none !important; }
+      input, textarea, select{ border:0; }
+      .photo-cell input[type="file"]{ display:none; }
+      .footer{
+        position:fixed;
+        left:18px;
+        right:18px;
+        bottom:12px;
+      }
     }
-    #pdfReport{
-      padding:18px;
-      border:1px solid #000;
-      width: 794px;
-      box-sizing:border-box;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-    .r-title{
-      font-weight:700;
-      font-size:15px;
-      text-align:center;
-      margin:8px 0 12px;
-      text-decoration:underline;
-    }
-    .r-org{
-      font-weight:700;
-      font-size:16px;
-      color:#0b4f8a;
-    }
-    .r-meta{
-      display:grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap:8px;
-      margin:10px 0 12px;
-      font-size:12px;
-    }
-    .r-meta div{ border:1px solid #ddd; padding:6px; }
-    .r-sec{
-      background:#e8f1fb;
-      border:1px solid #0b4f8a;
-      color:#0b4f8a;
-      font-weight:700;
-      padding:6px 10px;
-      margin:14px 0 8px;
-    }
-    .r-table th, .r-table td{ border:1px solid #000; padding:6px; font-size:11px; vertical-align:top; }
-    .r-table th{ background:#f2f2f2; }
-    .r-thumb{
-      width:110px;
-      height:75px;
-      border:1px solid #bbb;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-      background:#fff;
-    }
-    .r-thumb img{ width:100%; height:100%; object-fit:cover; }
-
   </style>
 </head>
 
@@ -260,12 +222,11 @@
       <img class="hdr-logo" src="logo.png" alt="CSPADT Logo">
     </div>
 
-    <!-- ✅ IMPORTANT: form is NOT posted directly now (PDF is generated + sent via fetch) -->
-    <form id="qcForm" onsubmit="return false;">
+    <form id="qcForm" method="POST" action="https://script.google.com/macros/s/AKfycbzmzWUi86tktkVWrm0DOjuK5XE8vEAKh8GcIBe1vWR45dN7dxsEJEAWUKTF_a4nlPs4/exec">
       <div class="meta">
         <div class="field">
           <label>QC No</label>
-          <select name="qcNo" required>
+          <select name="qcNo">
             <option value="">Select QC</option>
             <option>QC 101</option><option>QC 102</option><option>QC 103</option><option>QC 104</option><option>QC 105</option>
             <option>QC 106</option><option>QC 107</option><option>QC 108</option><option>QC 109</option><option>QC 110</option><option>QC 111</option>
@@ -275,14 +236,19 @@
         <div class="field"><label>Date Inspected</label><input type="date" name="dateInspected" class="locked" readonly /></div>
         <div class="field"><label>Time</label><input type="time" name="timeInspected" class="locked" readonly /></div>
         <div class="field"><label>Location</label><input type="text" name="location" /></div>
+
         <div class="field"><label>Inspector Name</label><input type="text" name="inspectorName" /></div>
         <div class="field"><label>Department / Company</label><input type="text" name="company" /></div>
-        <div class="field"><label>Weather</label>
+
+        <div class="field">
+          <label>Weather</label>
           <select name="weather">
             <option value="">Select</option><option>Clear</option><option>Sunny</option><option>Windy</option><option>Dusty</option><option>Rain</option><option>Humid</option>
           </select>
         </div>
-        <div class="field"><label>Shift</label>
+
+        <div class="field">
+          <label>Shift</label>
           <select name="shift">
             <option value="">Select</option><option>Day</option><option>Night</option>
           </select>
@@ -290,7 +256,7 @@
       </div>
 
       <div class="section-title">Checklist</div>
-      <table id="checklistTable">
+      <table>
         <thead>
           <tr>
             <th class="w-sn">S/N</th>
@@ -300,30 +266,558 @@
             <th class="w-photo">Photos</th>
           </tr>
         </thead>
+
         <tbody>
-          <!-- ===== Your 30 rows (same as you pasted) ===== -->
-          <!-- Row 1 -->
-          <tr>
-            <td class="center">1</td>
-            <td>Crane identification number and SWL load charts clearly displayed?</td>
-            <td class="center">
-              <label class="opt"><input type="radio" name="cond_1" value="Yes"> Yes</label>
-              <label class="opt"><input type="radio" name="cond_1" value="No"> No</label>
-              <label class="opt"><input type="radio" name="cond_1" value="NA"> N/A</label>
-            </td>
-            <td><textarea class="chk-remarks" name="remarks_1" placeholder="Finding / action / responsible / due date"></textarea></td>
-            <td>
-              <div class="photo-cell">
-                <input type="file" accept="image/*" data-preview="c1" />
-                <div class="thumb" id="c1">No image</div>
-              </div>
-            </td>
-          </tr>
 
-          <!-- ✅ Keep your rows 2...30 as-is (only change your NOT_Yes to No if you want) -->
-          <!-- IMPORTANT: Your file inputs MUST have data-preview="c2"..."c30" and thumb div id="c2"..."c30" -->
+<!-- ===================== CHECKLIST ROWS (1..30) ===================== -->
+<!-- IMPORTANT FIX:
+     Each row now has:
+     1) data-hidden="photo_cX" on file input
+     2) hidden input name="photo_cX"  (so Apps Script receives base64 thumbnail)
+-->
 
-          <!-- (Paste your remaining rows 2..30 here unchanged) -->
+<tr>
+  <td class="center">1</td>
+  <td>Crane identification number and SWL load charts clearly displayed?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_1" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_1" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_1" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_1" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c1" data-hidden="photo_c1" />
+      <input type="hidden" name="photo_c1" id="photo_c1" />
+      <div class="thumb" id="c1">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">2</td>
+  <td>No visible structural damage, corrosion, or deformation.</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_2" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_2" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_2" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_2" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c2" data-hidden="photo_c2" />
+      <input type="hidden" name="photo_c2" id="photo_c2" />
+      <div class="thumb" id="c2">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">3</td>
+  <td>Housekeeping satisfactory (no loose items, oil spills, or obstructions)?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_3" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_3" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_3" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_3" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c3" data-hidden="photo_c3" />
+      <input type="hidden" name="photo_c3" id="photo_c3" />
+      <div class="thumb" id="c3">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">4</td>
+  <td>Walkways, ladders, platforms, and handrails are in good condition.</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_4" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_4" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_4" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_4" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c4" data-hidden="photo_c4" />
+      <input type="hidden" name="photo_c4" id="photo_c4" />
+      <div class="thumb" id="c4">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">5</td>
+  <td>Gantry limit sensor functioning?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_5" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_5" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_5" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_5" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c5" data-hidden="photo_c5" />
+      <input type="hidden" name="photo_c5" id="photo_c5" />
+      <div class="thumb" id="c5">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">6</td>
+  <td>Wire ropes in good condition (no broken strands, kinks, corrosion)?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_6" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_6" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_6" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_6" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c6" data-hidden="photo_c6" />
+      <input type="hidden" name="photo_c6" id="photo_c6" />
+      <div class="thumb" id="c6">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">7</td>
+  <td>Load limiters operational?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_7" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_7" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_7" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_7" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c7" data-hidden="photo_c7" />
+      <input type="hidden" name="photo_c7" id="photo_c7" />
+      <div class="thumb" id="c7">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">8</td>
+  <td>Spreaders free from damage?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_8" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_8" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_8" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_8" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c8" data-hidden="photo_c8" />
+      <input type="hidden" name="photo_c8" id="photo_c8" />
+      <div class="thumb" id="c8">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">9</td>
+  <td>Control panels secured and labelled?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_9" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_9" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_9" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_9" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c9" data-hidden="photo_c9" />
+      <input type="hidden" name="photo_c9" id="photo_c9" />
+      <div class="thumb" id="c9">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">10</td>
+  <td>Adequate lighting (cabin, walkways, boom, and landside)?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_10" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_10" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_10" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_10" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c10" data-hidden="photo_c10" />
+      <input type="hidden" name="photo_c10" id="photo_c10" />
+      <div class="thumb" id="c10">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">11</td>
+  <td>Any exposed or damaged cables?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_11" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_11" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_11" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_11" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c11" data-hidden="photo_c11" />
+      <input type="hidden" name="photo_c11" id="photo_c11" />
+      <div class="thumb" id="c11">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">12</td>
+  <td>Cabin clean and ergonomically safe?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_12" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_12" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_12" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_12" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c12" data-hidden="photo_c12" />
+      <input type="hidden" name="photo_c12" id="photo_c12" />
+      <div class="thumb" id="c12">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">13</td>
+  <td>Seat, seatbelt, joystick, and controls in good condition?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_13" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_13" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_13" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_13" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c13" data-hidden="photo_c13" />
+      <input type="hidden" name="photo_c13" id="photo_c13" />
+      <div class="thumb" id="c13">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">14</td>
+  <td>Clear visibility (windows, wipers, defoggers working)?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_14" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_14" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_14" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_14" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c14" data-hidden="photo_c14" />
+      <input type="hidden" name="photo_c14" id="photo_c14" />
+      <div class="thumb" id="c14">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">15</td>
+  <td>Fire extinguisher available and inspected?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_15" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_15" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_15" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_15" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c15" data-hidden="photo_c15" />
+      <input type="hidden" name="photo_c15" id="photo_c15" />
+      <div class="thumb" id="c15">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">16</td>
+  <td>Communication system (radio/intercom) functional?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_16" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_16" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_16" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_16" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c16" data-hidden="photo_c16" />
+      <input type="hidden" name="photo_c16" id="photo_c16" />
+      <div class="thumb" id="c16">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">17</td>
+  <td>Audible alarms and warning horns working?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_17" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_17" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_17" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_17" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c17" data-hidden="photo_c17" />
+      <input type="hidden" name="photo_c17" id="photo_c17" />
+      <div class="thumb" id="c17">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">18</td>
+  <td>Emergency stop buttons functional and accessible?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_18" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_18" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_18" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_18" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c18" data-hidden="photo_c18" />
+      <input type="hidden" name="photo_c18" id="photo_c18" />
+      <div class="thumb" id="c18">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">19</td>
+  <td>Anti-collision and interlock systems working (if applicable)?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_19" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_19" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_19" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_19" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c19" data-hidden="photo_c19" />
+      <input type="hidden" name="photo_c19" id="photo_c19" />
+      <div class="thumb" id="c19">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">20</td>
+  <td>Safe access/egress maintained (no missing gratings, covers)?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_20" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_20" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_20" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_20" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c20" data-hidden="photo_c20" />
+      <input type="hidden" name="photo_c20" id="photo_c20" />
+      <div class="thumb" id="c20">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">21</td>
+  <td>Boom angle indicator and limits working?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_21" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_21" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_21" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_21" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c21" data-hidden="photo_c21" />
+      <input type="hidden" name="photo_c21" id="photo_c21" />
+      <div class="thumb" id="c21">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">22</td>
+  <td>Trolley travel and brakes functioning?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_22" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_22" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_22" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_22" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c22" data-hidden="photo_c22" />
+      <input type="hidden" name="photo_c22" id="photo_c22" />
+      <div class="thumb" id="c22">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">23</td>
+  <td>Hoist brake functioning and no abnormal noises?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_23" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_23" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_23" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_23" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c23" data-hidden="photo_c23" />
+      <input type="hidden" name="photo_c23" id="photo_c23" />
+      <div class="thumb" id="c23">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">24</td>
+  <td>Skew control / travel alignment normal?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_24" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_24" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_24" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_24" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c24" data-hidden="photo_c24" />
+      <input type="hidden" name="photo_c24" id="photo_c24" />
+      <div class="thumb" id="c24">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">25</td>
+  <td>Storm pins / tie-downs available and in good condition?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_25" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_25" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_25" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_25" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c25" data-hidden="photo_c25" />
+      <input type="hidden" name="photo_c25" id="photo_c25" />
+      <div class="thumb" id="c25">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">26</td>
+  <td>Anemometer / wind speed display functional (if installed)?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_26" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_26" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_26" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_26" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c26" data-hidden="photo_c26" />
+      <input type="hidden" name="photo_c26" id="photo_c26" />
+      <div class="thumb" id="c26">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">27</td>
+  <td>PPE signage and safety instructions visible?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_27" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_27" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_27" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_27" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c27" data-hidden="photo_c27" />
+      <input type="hidden" name="photo_c27" id="photo_c27" />
+      <div class="thumb" id="c27">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">28</td>
+  <td>Any oil leaks from hydraulic systems?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_28" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_28" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_28" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_28" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c28" data-hidden="photo_c28" />
+      <input type="hidden" name="photo_c28" id="photo_c28" />
+      <div class="thumb" id="c28">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">29</td>
+  <td>Lubrication points maintained and no excessive grease on walkways?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_29" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_29" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_29" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_29" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c29" data-hidden="photo_c29" />
+      <input type="hidden" name="photo_c29" id="photo_c29" />
+      <div class="thumb" id="c29">No image</div>
+    </div>
+  </td>
+</tr>
+
+<tr>
+  <td class="center">30</td>
+  <td>Fire detection / suppression system healthy (if installed)?</td>
+  <td class="center">
+    <label class="opt"><input type="radio" name="cond_30" value="Yes"> Yes </label>
+    <label class="opt"><input type="radio" name="cond_30" value="NOT_Yes"> No </label>
+    <label class="opt"><input type="radio" name="cond_30" value="NA"> N/A</label>
+  </td>
+  <td><textarea class="chk-remarks" name="remarks_30" placeholder="Finding / action / responsible / due date"></textarea></td>
+  <td>
+    <div class="photo-cell">
+      <input type="file" accept="image/*" data-preview="c30" data-hidden="photo_c30" />
+      <input type="hidden" name="photo_c30" id="photo_c30" />
+      <div class="thumb" id="c30">No image</div>
+    </div>
+  </td>
+</tr>
+
+<!-- ===================== END CHECKLIST ROWS ===================== -->
+
         </tbody>
       </table>
 
@@ -358,7 +852,7 @@
           </div>
           <div style="margin-top:8px; display:flex; justify-content:space-between; gap:10px; align-items:center;">
             <div><b>Date:</b> <input type="date" name="hseInspectorSignDate" style="width:170px" /></div>
-            <div>
+            <div class="sig-actions">
               <button type="button" class="secondary" onclick="clearSig('sig1','sig_hseInspector')">Clear</button>
             </div>
           </div>
@@ -374,7 +868,7 @@
           </div>
           <div style="margin-top:8px; display:flex; justify-content:space-between; gap:10px; align-items:center;">
             <div><b>Date:</b> <input type="date" name="hsseManagerSignDate" style="width:170px" /></div>
-            <div>
+            <div class="sig-actions">
               <button type="button" class="secondary" onclick="clearSig('sig2','sig_hsseManager')">Clear</button>
             </div>
           </div>
@@ -382,7 +876,7 @@
       </div>
 
       <div class="actions">
-        <button type="button" onclick="generateAndSendPDF()">Send (Auto PDF + Email)</button>
+        <button type="submit">Send</button>
         <button type="button" class="secondary" onclick="resetAll()">Clear Form</button>
       </div>
 
@@ -409,51 +903,29 @@
           </tbody>
         </table>
       </div>
+
     </form>
   </div>
 
-  <!-- ✅ Hidden render area for “beautiful PDF” -->
-  <div id="pdfReportWrapper">
-    <div id="pdfReport"></div>
-  </div>
-
   <script>
-    /* ===========================
-       ✅ PASTE YOUR GOOGLE WEB APP URL HERE
-       (Deploy Apps Script as Web App -> /exec URL)
-       =========================== */
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwDEAoKz0XmkJIpyzglsmlxvb5GNP2zfk1U4jlae5PMZjFxb7F0ZvNMfhCQVhzJQiKw/exec";
-
-    // Photo preview on screen
-    document.addEventListener('change', function(e){
-      const inp = e.target;
-      if(inp && inp.matches('input[type="file"][data-preview]')){
-        const id = inp.getAttribute('data-preview');
-        const box = document.getElementById(id);
-        const file = inp.files && inp.files[0];
-        if(!box) return;
-        if(!file){ box.textContent = "No image"; return; }
-        const url = URL.createObjectURL(file);
-        box.innerHTML = '<img alt="preview" src="' + url + '">';
-      }
-    });
-
-    // Auto-fill Date + Time on open
+    /************ AUTO DATE + TIME + DEFAULT 1 OBS ROW ************/
     document.addEventListener('DOMContentLoaded', () => {
       const dInp = document.querySelector('input[name="dateInspected"]');
       const tInp = document.querySelector('input[name="timeInspected"]');
       const now = new Date();
 
-      if(dInp && !dInp.value){
+      if(dInp){
         const yyyy = now.getFullYear();
         const mm = String(now.getMonth() + 1).padStart(2,'0');
         const dd = String(now.getDate()).padStart(2,'0');
         dInp.value = `${yyyy}-${mm}-${dd}`;
+        dInp.readOnly = true;
       }
-      if(tInp && !tInp.value){
+      if(tInp){
         const hh = String(now.getHours()).padStart(2,'0');
         const mi = String(now.getMinutes()).padStart(2,'0');
         tInp.value = `${hh}:${mi}`;
+        tInp.readOnly = true;
       }
 
       const addBtn = document.getElementById('addObsRowBtn');
@@ -462,7 +934,7 @@
       const tbody = document.getElementById('obsBody');
       if(tbody){
         tbody.innerHTML = '';
-        addObservationRow(); // ONLY ONE DEFAULT ROW
+        addObservationRow(); // ONE row only by default
       }
       renumberObservationRows();
 
@@ -470,7 +942,64 @@
       setupPad('sig2','sig_hsseManager');
     });
 
-    // Observations add/delete + renumber
+    /************ THUMBNAILS -> HIDDEN INPUTS (OPTION 1) ************/
+    async function fileToThumbDataUrl(file, maxW=1200, maxH=1200, quality=0.80){
+      const dataUrl = await new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = () => res(r.result);
+        r.onerror = rej;
+        r.readAsDataURL(file);
+      });
+
+      const img = await new Promise((res, rej) => {
+        const i = new Image();
+        i.onload = () => res(i);
+        i.onerror = rej;
+        i.src = dataUrl;
+      });
+
+      const scale = Math.min(maxW / img.width, maxH / img.height, 1);
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+
+      return canvas.toDataURL('image/jpeg', quality);
+    }
+
+    document.addEventListener('change', async (e) => {
+      const inp = e.target;
+      if(!inp || !inp.matches('input[type="file"][data-preview]')) return;
+
+      const previewId = inp.getAttribute('data-preview');
+      const hiddenKey = inp.getAttribute('data-hidden'); // can be id or name
+      const box = previewId ? document.getElementById(previewId) : null;
+
+      const file = inp.files && inp.files[0];
+      if(!file){
+        if(box) box.textContent = "No image";
+        if(hiddenKey){
+          const h = document.getElementById(hiddenKey) || document.querySelector(`input[name="${hiddenKey}"]`);
+          if(h) h.value = "";
+        }
+        return;
+      }
+
+      const thumbDataUrl = await fileToThumbDataUrl(file, 1200, 1200, 0.80);
+
+      if(box) box.innerHTML = `<img alt="preview" src="${thumbDataUrl}">`;
+
+      if(hiddenKey){
+        const h = document.getElementById(hiddenKey) || document.querySelector(`input[name="${hiddenKey}"]`);
+        if(h) h.value = thumbDataUrl;
+      }
+    });
+
+    /************ OBSERVATIONS: ADD + DELETE + AUTO S/N + NAMES + PHOTO KEYS ************/
     function addObservationRow(){
       const tbody = document.getElementById('obsBody');
       if(!tbody) return;
@@ -481,7 +1010,8 @@
         <td><textarea class="obs-ta" name="" placeholder="Describe observation"></textarea></td>
         <td>
           <div class="photo-cell">
-            <input type="file" accept="image/*" data-preview="" />
+            <input type="file" accept="image/*" data-preview="" data-hidden="" />
+            <input type="hidden" name="" />
             <div class="thumb">No image</div>
           </div>
         </td>
@@ -519,9 +1049,12 @@
       const rows = Array.from(tbody.querySelectorAll('tr'));
       rows.forEach((tr, idx) => {
         const n = idx + 1;
+
+        // S/N
         const snCell = tr.querySelector('td');
         if(snCell) snCell.textContent = n;
 
+        // Fields
         const obs = tr.querySelector('textarea.obs-ta');
         const rec = tr.querySelector('textarea.rec-ta');
         const status = tr.querySelector('select');
@@ -530,18 +1063,29 @@
         if(rec) rec.name = `rec_${n}`;
         if(status) status.name = `status_${n}`;
 
+        // Photo (preview + hidden field)
         const file = tr.querySelector('input[type="file"][data-preview]');
         const thumb = tr.querySelector('.thumb');
-        const pid = `o${n}`;
+        const hidden = tr.querySelector('input[type="hidden"]');
 
-        if(file) file.setAttribute('data-preview', pid);
+        const pid = `o${n}`;            // preview div id
+        const hidName = `photo_o${n}`;  // field sent to Apps Script
+
+        if(file){
+          file.setAttribute('data-preview', pid);
+          file.setAttribute('data-hidden', hidName);
+        }
         if(thumb){
           thumb.id = pid;
           if(!thumb.querySelector('img')) thumb.textContent = "No image";
         }
+        if(hidden){
+          hidden.name = hidName;
+        }
       });
     }
 
+    /************ RESET ************/
     function resetAll(){
       if(confirm("Clear everything?")){
         document.getElementById('qcForm').reset();
@@ -549,16 +1093,28 @@
         clearSig('sig1','sig_hseInspector');
         clearSig('sig2','sig_hsseManager');
 
-        // re-add only one observation row
+        // Re-apply locked date/time + one obs row
         const tbody = document.getElementById('obsBody');
-        if(tbody){
-          tbody.innerHTML = '';
-          addObservationRow();
+        if(tbody){ tbody.innerHTML = ''; addObservationRow(); renumberObservationRows(); }
+
+        const now = new Date();
+        const dInp = document.querySelector('input[name="dateInspected"]');
+        const tInp = document.querySelector('input[name="timeInspected"]');
+        if(dInp){
+          const yyyy = now.getFullYear();
+          const mm = String(now.getMonth() + 1).padStart(2,'0');
+          const dd = String(now.getDate()).padStart(2,'0');
+          dInp.value = `${yyyy}-${mm}-${dd}`;
+        }
+        if(tInp){
+          const hh = String(now.getHours()).padStart(2,'0');
+          const mi = String(now.getMinutes()).padStart(2,'0');
+          tInp.value = `${hh}:${mi}`;
         }
       }
     }
 
-    // Signatures
+    /************ SIGNATURE PADS ************/
     function setupPad(canvasId, hiddenId){
       const canvas = document.getElementById(canvasId);
       const hidden = document.getElementById(hiddenId);
@@ -585,12 +1141,7 @@
 
       function start(ev){ ev.preventDefault(); drawing = true; const p = pos(ev); ctx.beginPath(); ctx.moveTo(p.x,p.y); }
       function move(ev){ if(!drawing) return; ev.preventDefault(); const p = pos(ev); ctx.lineTo(p.x,p.y); ctx.stroke(); }
-      function end(ev){
-        if(!drawing) return;
-        ev.preventDefault();
-        drawing = false;
-        if(hidden) hidden.value = canvas.toDataURL('image/png');
-      }
+      function end(ev){ if(!drawing) return; ev.preventDefault(); drawing = false; if(hidden) hidden.value = canvas.toDataURL('image/png'); }
 
       canvas.addEventListener('mousedown', start);
       canvas.addEventListener('mousemove', move);
@@ -611,273 +1162,7 @@
       const h = document.getElementById(hiddenId);
       if(h) h.value = '';
     }
-
-    // Helpers
-    function esc(s){
-      return String(s ?? "").replace(/[&<>"']/g, m => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[m]));
-    }
-    function getVal(name){
-      const el = document.querySelector(`[name="${name}"]`);
-      return el ? el.value : "";
-    }
-    function getRadio(name){
-      const r = document.querySelector(`input[name="${name}"]:checked`);
-      return r ? r.value : "";
-    }
-    function readAsDataURL(file){
-      return new Promise((resolve) => {
-        if(!file) return resolve("");
-        const fr = new FileReader();
-        fr.onload = () => resolve(fr.result || "");
-        fr.onerror = () => resolve("");
-        fr.readAsDataURL(file);
-      });
-    }
-
-    // ✅ MAIN: Generate beautiful PDF + send to Google Script (email with attachment)
-    async function generateAndSendPDF(){
-      if(WEB_APP_URL.includes("PASTE_YOUR_GOOGLE_WEB_APP_URL_HERE")){
-        alert("Paste your Google Web App URL inside WEB_APP_URL first.");
-        return;
-      }
-
-      // basic required field
-      const qcNo = getVal("qcNo");
-      if(!qcNo){
-        alert("Please select QC No.");
-        return;
-      }
-
-      const meta = {
-        qcNo,
-        dateInspected: getVal("dateInspected"),
-        timeInspected: getVal("timeInspected"),
-        location: getVal("location"),
-        inspectorName: getVal("inspectorName"),
-        company: getVal("company"),
-        weather: getVal("weather"),
-        shift: getVal("shift"),
-        hseInspectorName: getVal("hseInspectorName"),
-        hseInspectorSignDate: getVal("hseInspectorSignDate"),
-        hsseManagerName: getVal("hsseManagerName"),
-        hsseManagerSignDate: getVal("hsseManagerSignDate"),
-        sigHse: getVal("sig_hseInspector"),
-        sigHsse: getVal("sig_hsseManager")
-      };
-
-      // Collect checklist rows
-      const checklistRows = Array.from(document.querySelectorAll("#checklistTable tbody tr"));
-      const checklistData = [];
-      for(const tr of checklistRows){
-        const sn = (tr.children[0]?.textContent || "").trim();
-        const item = (tr.children[1]?.textContent || "").trim();
-
-        // radio name is cond_SN
-        const cond = getRadio(`cond_${sn}`);
-        const remarks = tr.querySelector(`textarea[name="remarks_${sn}"]`)?.value || "";
-
-        const fileInp = tr.querySelector('input[type="file"][data-preview]');
-        const imgData = fileInp && fileInp.files && fileInp.files[0] ? await readAsDataURL(fileInp.files[0]) : "";
-
-        checklistData.push({sn, item, cond, remarks, imgData});
-      }
-
-      // Collect observation rows
-      const obsRows = Array.from(document.querySelectorAll("#obsBody tr"));
-      const obsData = [];
-      for(let i=0;i<obsRows.length;i++){
-        const tr = obsRows[i];
-        const n = i+1;
-
-        const obs = tr.querySelector(`textarea[name="obs_${n}"]`)?.value || "";
-        const rec = tr.querySelector(`textarea[name="rec_${n}"]`)?.value || "";
-        const status = tr.querySelector(`select[name="status_${n}"]`)?.value || "";
-
-        const fileInp = tr.querySelector('input[type="file"][data-preview]');
-        const imgData = fileInp && fileInp.files && fileInp.files[0] ? await readAsDataURL(fileInp.files[0]) : "";
-
-        obsData.push({sn:n, obs, rec, status, imgData});
-      }
-
-      // Build PDF report HTML (clean + thumbnails)
-      const report = document.getElementById("pdfReport");
-      report.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
-          <div>
-            <div class="r-org">CSP Abu Dhabi Terminal Environment, Health and Safety Management</div>
-            <div class="r-title">Quay crane (QC) Inspection checklist</div>
-          </div>
-          <div>
-            <img src="logo.png" style="height:65px; width:auto;" alt="CSPADT Logo">
-          </div>
-        </div>
-
-        <div class="r-meta">
-          <div><b>QC No:</b> ${esc(meta.qcNo)}</div>
-          <div><b>Date / Time:</b> ${esc(meta.dateInspected)} ${esc(meta.timeInspected)}</div>
-          <div><b>Location:</b> ${esc(meta.location)}</div>
-          <div><b>Inspector Name:</b> ${esc(meta.inspectorName)}</div>
-          <div><b>Dept / Company:</b> ${esc(meta.company)}</div>
-          <div><b>Weather / Shift:</b> ${esc(meta.weather)} / ${esc(meta.shift)}</div>
-        </div>
-
-        <div class="r-sec">Checklist</div>
-        <table class="r-table" style="width:100%; border-collapse:collapse;">
-          <thead>
-            <tr>
-              <th style="width:35px;">S/N</th>
-              <th>Inspection Item</th>
-              <th style="width:70px;">Cond.</th>
-              <th>Remarks</th>
-              <th style="width:120px;">Photo</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${checklistData.map(r => `
-              <tr>
-                <td class="center">${esc(r.sn)}</td>
-                <td>${esc(r.item)}</td>
-                <td class="center">${esc(r.cond)}</td>
-                <td>${esc(r.remarks)}</td>
-                <td>
-                  <div class="r-thumb">
-                    ${r.imgData ? `<img src="${r.imgData}" alt="photo">` : `<span style="color:#777;">No image</span>`}
-                  </div>
-                </td>
-              </tr>
-            `).join("")}
-          </tbody>
-        </table>
-
-        <div class="r-sec">Observations / Recommendations</div>
-        <table class="r-table" style="width:100%; border-collapse:collapse;">
-          <thead>
-            <tr>
-              <th style="width:35px;">S/N</th>
-              <th>Observation</th>
-              <th style="width:120px;">Photo</th>
-              <th>Recommendation</th>
-              <th style="width:70px;">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${obsData.map(r => `
-              <tr>
-                <td class="center">${esc(r.sn)}</td>
-                <td>${esc(r.obs)}</td>
-                <td>
-                  <div class="r-thumb">
-                    ${r.imgData ? `<img src="${r.imgData}" alt="photo">` : `<span style="color:#777;">No image</span>`}
-                  </div>
-                </td>
-                <td>${esc(r.rec)}</td>
-                <td class="center">${esc(r.status)}</td>
-              </tr>
-            `).join("")}
-          </tbody>
-        </table>
-
-        <div class="r-sec">Signatures</div>
-        <table class="r-table" style="width:100%; border-collapse:collapse;">
-          <thead>
-            <tr>
-              <th>HSE Inspector</th>
-              <th>HSSE Manager (HSSEM)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <b>Name:</b> ${esc(meta.hseInspectorName)}<br>
-                <b>Date:</b> ${esc(meta.hseInspectorSignDate)}<br><br>
-                ${meta.sigHse ? `<img src="${meta.sigHse}" style="width:100%; max-height:110px; border:1px solid #000;" alt="sig">` : `<span style="color:#777;">No signature</span>`}
-              </td>
-              <td>
-                <b>Name:</b> ${esc(meta.hsseManagerName)}<br>
-                <b>Date:</b> ${esc(meta.hsseManagerSignDate)}<br><br>
-                ${meta.sigHsse ? `<img src="${meta.sigHsse}" style="width:100%; max-height:110px; border:1px solid #000;" alt="sig">` : `<span style="color:#777;">No signature</span>`}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div style="margin-top:12px;">
-          <table class="r-table" style="width:100%; border-collapse:collapse;">
-            <thead>
-              <tr>
-                <th>Prepared By</th>
-                <th>Reviewed By</th>
-                <th>Revision</th>
-                <th>Control #</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="center">HSSE Committee Team</td>
-                <td class="center">Abdul Rouf</td>
-                <td class="center">1.0</td>
-                <td class="center">CSP-HSSE-FRM-076</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      `;
-
-      // Render to PDF (multi-page supported)
-      const { jsPDF } = window.jspdf;
-      const canvas = await html2canvas(report, {scale: 2, backgroundColor:"#ffffff"});
-      const imgData = canvas.toDataURL("image/jpeg", 0.95);
-
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pageWidth = 210;
-      const pageHeight = 297;
-
-      const imgProps = pdf.getImageProperties(imgData);
-      const imgWidth = pageWidth;
-      const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-
-      const fileName = `QC-Inspection-${meta.qcNo}-${meta.dateInspected}.pdf`;
-      const pdfBase64 = pdf.output("datauristring").split(",")[1];
-
-      // Send to Apps Script (email attachment)
-      try{
-        // no-cors avoids CORS issues on Apps Script, email still sends
-        await fetch(WEB_APP_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: {"Content-Type":"application/json"},
-          body: JSON.stringify({
-            to: "saleh.shaikh@cspadt.ae",
-            subject: `QC Inspection Checklist - ${meta.qcNo} - ${meta.dateInspected}`,
-            bodyHtml: `<p>Please find attached the QC Inspection Checklist PDF.</p>
-                       <p><b>QC:</b> ${esc(meta.qcNo)}<br>
-                       <b>Date/Time:</b> ${esc(meta.dateInspected)} ${esc(meta.timeInspected)}<br>
-                       <b>Inspector:</b> ${esc(meta.inspectorName)}</p>`,
-            filename: fileName,
-            pdfBase64: pdfBase64
-          })
-        });
-
-        alert("✅ Sent! Email with PDF attachment is on the way.");
-      }catch(err){
-        alert("Failed to send. Check Web App URL & deployment permissions.");
-      }
-    }
   </script>
+
 </body>
 </html>
